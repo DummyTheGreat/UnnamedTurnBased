@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Combo" load_steps=5 format=3 uid="uid://djwhy55rhyi1p"]
+
+[ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battleResources/combatMove.gd" id="1_045tw"]
+[ext_resource type="Script" uid="uid://k45vscloe14l" path="res://src/battleResources/combo.gd" id="2_6pl6g"]
+[ext_resource type="Resource" uid="uid://bwlljbscq8vd7" path="res://src/battleResources/moveResources/sword_slash.tres" id="2_6ppbt"]
+[ext_resource type="Resource" uid="uid://bxgdjxjytjte4" path="res://src/battleResources/moveResources/sword_pierce.tres" id="3_x5588"]
+
+[resource]
+script = ExtResource("2_6pl6g")
+comboList = Array[ExtResource("1_045tw")]([ExtResource("2_6ppbt"), ExtResource("3_x5588")])

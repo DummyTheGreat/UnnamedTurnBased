@@ -1,0 +1,111 @@
+[gd_scene load_steps=13 format=3 uid="uid://bhnyyu8t00bk5"]
+
+[ext_resource type="Script" path="res://src/battle_engine/battle.gd" id="1_cdclp"]
+[ext_resource type="Texture2D" uid="uid://bb4jynn5qf43f" path="res://assets/player.png" id="2_etjw6"]
+[ext_resource type="Script" path="res://src/characters/ally.gd" id="2_miag1"]
+[ext_resource type="Texture2D" uid="uid://djrcw4bpg4dyn" path="res://assets/enemy.png" id="3_ktxq8"]
+[ext_resource type="Script" path="res://src/battle_engine/battleField.gd" id="4_6ek73"]
+[ext_resource type="Script" path="res://src/characters/enemy.gd" id="4_7bqa5"]
+[ext_resource type="Script" path="res://src/battle_engine/cameraFocus.gd" id="4_x5rsb"]
+[ext_resource type="Script" path="res://src/battle_engine/battleCamera.gd" id="6_qwkl0"]
+[ext_resource type="Script" path="res://src/battle_engine/reactionPath.gd" id="7_b5lnk"]
+
+[sub_resource type="Curve2D" id="Curve2D_s3orl"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 580, 30, 0, 0, 0, 0, 20, 30)
+}
+point_count = 2
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_84e7o"]
+size = Vector2(60, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qxmty"]
+size = Vector2(16, 16)
+
+[node name="battle" type="Node2D"]
+script = ExtResource("1_cdclp")
+
+[node name="ReactionPath" type="Path2D" parent="."]
+curve = SubResource("Curve2D_s3orl")
+script = ExtResource("7_b5lnk")
+
+[node name="ColorRect" type="ColorRect" parent="ReactionPath"]
+z_index = -2
+offset_right = 600.0
+offset_bottom = 60.0
+color = Color(0.0235294, 0.0509804, 0.105882, 1)
+
+[node name="ClickBox" type="ColorRect" parent="ReactionPath"]
+z_index = -1
+offset_left = 270.0
+offset_right = 330.0
+offset_bottom = 60.0
+color = Color(0.2106, 0.187467, 0.417412, 1)
+
+[node name="ClickArea" type="Area2D" parent="ReactionPath"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ReactionPath/ClickArea"]
+position = Vector2(300, 30)
+shape = SubResource("RectangleShape2D_84e7o")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+offset = Vector2(192, 108)
+zoom = Vector2(2, 2)
+script = ExtResource("6_qwkl0")
+
+[node name="Marker2D" type="Marker2D" parent="Camera2D"]
+script = ExtResource("4_x5rsb")
+
+[node name="Field" type="Node2D" parent="."]
+script = ExtResource("4_6ek73")
+
+[node name="Allies" type="Node2D" parent="Field"]
+
+[node name="TestAlly1" type="CharacterBody2D" parent="Field/Allies" groups=["Allies"]]
+script = ExtResource("2_miag1")
+
+[node name="Sprite2D" type="Sprite2D" parent="Field/Allies/TestAlly1"]
+texture = ExtResource("2_etjw6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Field/Allies/TestAlly1"]
+shape = SubResource("RectangleShape2D_qxmty")
+
+[node name="RayCast2D" type="RayCast2D" parent="Field/Allies/TestAlly1"]
+
+[node name="TestAlly2" type="CharacterBody2D" parent="Field/Allies" groups=["Allies"]]
+script = ExtResource("2_miag1")
+
+[node name="Sprite2D" type="Sprite2D" parent="Field/Allies/TestAlly2"]
+texture = ExtResource("2_etjw6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Field/Allies/TestAlly2"]
+shape = SubResource("RectangleShape2D_qxmty")
+
+[node name="TestAlly3" type="CharacterBody2D" parent="Field/Allies" groups=["Allies"]]
+script = ExtResource("2_miag1")
+
+[node name="Sprite2D" type="Sprite2D" parent="Field/Allies/TestAlly3"]
+texture = ExtResource("2_etjw6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Field/Allies/TestAlly3"]
+shape = SubResource("RectangleShape2D_qxmty")
+
+[node name="Enemies" type="Node2D" parent="Field"]
+
+[node name="TestEnemy1" type="CharacterBody2D" parent="Field/Enemies" groups=["Enemies"]]
+script = ExtResource("4_7bqa5")
+
+[node name="Sprite2D" type="Sprite2D" parent="Field/Enemies/TestEnemy1"]
+texture = ExtResource("3_ktxq8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Field/Enemies/TestEnemy1"]
+shape = SubResource("RectangleShape2D_qxmty")
+
+[node name="TestEnemy2" type="CharacterBody2D" parent="Field/Enemies" groups=["Enemies"]]
+script = ExtResource("4_7bqa5")
+
+[node name="Sprite2D" type="Sprite2D" parent="Field/Enemies/TestEnemy2"]
+texture = ExtResource("3_ktxq8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Field/Enemies/TestEnemy2"]
+shape = SubResource("RectangleShape2D_qxmty")

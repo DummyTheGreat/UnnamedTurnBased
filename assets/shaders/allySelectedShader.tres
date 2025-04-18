@@ -1,0 +1,6 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://vdtpq4ynghtg"]
+
+[ext_resource type="Shader" path="res://assets/shaders/allySelectedShader.gdshader" id="1_lfxt8"]
+
+[resource]
+shader = ExtResource("1_lfxt8")
