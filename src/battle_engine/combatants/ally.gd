@@ -2,7 +2,7 @@ class_name Ally
 extends CharacterStats
 
 @onready var directionRay = $RayCast2D
-@onready var cameraFocus : CameraFocus = $"../../../Camera2D/Marker2D"
+@onready var cameraFocus : CameraFocus = $"../../../BattleCamera/CenterFocus"
 @onready var collisionShape = $CollisionShape2D
 
 var actionTimer = null

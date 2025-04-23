@@ -3,7 +3,7 @@ extends Node2D
 ## References
 @onready var allies = $Field/Allies.get_children()
 @onready var enemies = $Field/Enemies.get_children()
-@onready var camera = $Camera2D
+@onready var camera = $BattleCamera
 @onready var reactionPath = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath
 @onready var reactionClickArea = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath/ClickArea
 @onready var turnOrder = $UILayer/BattleUI/HorizontalContainer/MarginContainer/TurnOrderVisual

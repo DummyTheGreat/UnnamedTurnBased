@@ -65,12 +65,12 @@ shape = SubResource("RectangleShape2D_84e7o")
 [node name="Panel" type="Panel" parent="UILayer/BattleUI/HorizontalContainer/ReactionUI"]
 layout_mode = 2
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="BattleCamera" type="Camera2D" parent="."]
 offset = Vector2(192, 108)
 zoom = Vector2(2, 2)
 script = ExtResource("6_qwkl0")
 
-[node name="Marker2D" type="Marker2D" parent="Camera2D"]
+[node name="CenterFocus" type="Marker2D" parent="BattleCamera"]
 script = ExtResource("4_x5rsb")
 
 [node name="Field" type="Node2D" parent="."]

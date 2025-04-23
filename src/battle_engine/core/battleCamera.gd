@@ -3,7 +3,7 @@ extends Camera2D
 ## This script handles the battle camera's positional translation and scaling
 
 ## References
-@onready var target = $Marker2D
+@onready var target = $CenterFocus
 
 var zoomTicks = 0 ## A decrementing value used to countdown how long the camera should zoom in
 var speed : float = 5.0 ## I need to review what this does lol, something with lerp()
