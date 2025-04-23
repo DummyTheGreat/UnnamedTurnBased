@@ -44,7 +44,6 @@ func _ready():
 	
 
 func _action():
-	print("action")
 	var target = self._assess_targets(self.owner.allies)
 	
 	

@@ -49,8 +49,8 @@ func _ready():
 	overlappingCollisionArea.add_child(areaCollision)
 		
 	comboChains = [
-		load("res://src/battleResources/comboResources/swordSlashDouble.tres"),
-		load("res://src/battleResources/comboResources/sword_0_2.tres")
+		load("res://src/battle_engine/resources/combos/swordSlashDouble.tres"),
+		load("res://src/battle_engine/resources/combos/sword_0_2.tres")
 	]
 		
 
@@ -88,5 +88,4 @@ func _process(delta):
 		
 	for i in range(get_slide_collision_count() - 1):
 		var collision = get_slide_collision(i)
-		print("penis")
 		print(collision.get_collider())

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="CombatMove" load_steps=2 format=3 uid="uid://bwlljbscq8vd7"]
 
-[ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battleResources/combatMove.gd" id="1_5kvib"]
+[ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatMove.gd" id="1_5kvib"]
 
 [resource]
 script = ExtResource("1_5kvib")

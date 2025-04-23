@@ -19,6 +19,11 @@ config/icon="res://icon.svg"
 
 SignalBus="*res://src/main/SignalBus.gd"
 
+[editor]
+
+version_control/plugin_name="GitPlugin"
+version_control/autoload_on_startup=true
+
 [input]
 
 move_left={
