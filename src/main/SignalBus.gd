@@ -1,5 +1,7 @@
 extends Node
 
+# A script for centralizing complex signals into one place
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

@@ -1,5 +1,6 @@
 extends Node2D
 
+## References
 @onready var allies = $Field/Allies.get_children()
 @onready var enemies = $Field/Enemies.get_children()
 @onready var camera = $Camera2D
@@ -7,57 +8,52 @@ extends Node2D
 @onready var reactionClickArea = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath/ClickArea
 @onready var turnOrder = $UILayer/BattleUI/HorizontalContainer/MarginContainer/TurnOrderVisual
 
+## Load shaders
 @onready var selectShader = preload("res://assets/shaders/allySelectedShader.tres")
 
-var selectedAlly = null
-var actionState = "actionSelect"
-var selectedEnemy = null
-var playerAction : bool = false
-var comboIndex = 0
+var selectedAlly = null ## The ally combatant that the player is currently in control of
+var actionState = "actionSelect" ## The state value for the battle's state machine
+var selectedEnemy = null ## The enemy which the player is targeting
+var playerAction : bool = false ## True if it is the player's (ally's) turn, false if enemy's turn
+var comboIndex = 0 ## The stage of the current combo in execution
+var selectedComboChain = null ## The combo chain selected to be executed for the turn
+var speedMap : Array[TurnOrder] = [] ## The list for tracking the current order of combatant turns
+var returnPosition : Vector2 = Vector2(0, 0) ## The position which an ally or enemy returns after executing their turn
 
-const weapons = {
-	"sword": 0,
-	"spear": 1,
-	"hammer": 2
-}
-
-const attack = {
-	0: "slash",
-	1: "strike",
-	2: "pierce"
-}
-
-var selectedComboChain = null
-
-var speedMap : Array[TurnOrder] = []
-
-var returnPosition : Vector2 = Vector2(0, 0)
-
+## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
 func _customSpeedSort(a : TurnOrder, b : TurnOrder):
-		if a.speed > b.speed:
-			return true
-		return false
+		return (a.speed > b.speed)
 
+## *Signal Function*
+## Emits when overlappingCollisionArea "body_entered" signal is triggered in ally.gd (built-in node signal)
+## @param body - The node which overlappingCollisionArea has an overlapping collision with
+## @param damage - The number of hit points to remove from the colliding body's health
 func _process_damage(body: Node2D, damage: int):
 	body.current_health -= damage
 	pass
 
+## Gets a list of the combatants in the battle field and determines the next one to take turn
+## @return - A reference to the node of the next combatant to take turn
 func getNextCombatant():
 	
 	var combatants = get_tree().get_nodes_in_group("Combatants")
 	var nextCombatant = combatants[combatants.find_custom(
 		func(combatant): return combatant.combatID == speedMap[0].id
 		)]
+	# TODO: Temporary, will need to be changed so that the player can select a combo
 	selectedComboChain = nextCombatant.comboChains[0]
 	return nextCombatant
 	
-func processComboInput(attackVariant: int, skillPointsUsed: int):
+## Handles the user input during a quick-time combo string 
+## @param attackVariant - The type of attack executed by the player determined by their input
+## @param skillPointsUsed - The number of skill poitns to remove from the combatant
+func processComboInput(attackVariant: String, skillPointsUsed: int):
 	
 	var overlaps = reactionClickArea.get_overlapping_areas()
 		
 	if len(overlaps) > 0:
 		
-		if (attack[attackVariant] == overlaps[0].get_parent().attackVariant):
+		if (attackVariant == overlaps[0].get_parent().attackVariant):
 			var currMove : CombatMove = selectedComboChain.comboList[comboIndex]
 			selectedAlly.skill_points -= skillPointsUsed
 			
@@ -69,7 +65,7 @@ func processComboInput(attackVariant: int, skillPointsUsed: int):
 			# Disable collision mask that matches the collision layer of the enemy target
 			selectedAlly.collision_mask = 0b00
 			selectedAlly.isAttacking = true
-			# Connect to signal for overlapping collision detection
+			# Connect to the selected ally's signal for overlapping collision detection
 			selectedAlly.overlappingCollisionArea.body_entered.connect(_process_damage.bind(currMove.damage))
 			comboIndex += 1
 		else:
@@ -171,7 +167,7 @@ func _process(delta):
 				print(selectedComboChain.comboList[0])
 				for move in selectedComboChain.comboList:
 					timeSummation += move.reactionTime
-					var follower = ReactionPathFollower.new(attack[move.attackVariant], timeSummation)
+					var follower = ReactionPathFollower.new(move.attackVariant, timeSummation)
 					reactionPath.add_child(follower)
 				
 		
@@ -182,13 +178,13 @@ func _process(delta):
 				actionState = "combatReset"
 					
 			if Input.is_action_just_pressed("slash"):
-				processComboInput(0, 2)
+				processComboInput("slash", 2)
 				
 			elif Input.is_action_just_pressed("strike"):
-				processComboInput(1, 4)
+				processComboInput("strike", 4)
 
 			elif Input.is_action_just_pressed("pierce"):
-				processComboInput(2, 3)
+				processComboInput("pierce", 3)
 				
 		if actionState == "combatReset":
 			selectedAlly.global_position = returnPosition
