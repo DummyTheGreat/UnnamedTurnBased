@@ -1,6 +1,9 @@
 class_name CameraFocus
 extends Marker2D
 
+## The CameraFocus is used to get a point of position centered between two nodes that
+## the camera is then set to follow
+
 @onready var first = self.get_parent() ## The first node to be used for finding the center point
 @onready var second = self.get_parent() ## The second node to be used for finding the center point
 

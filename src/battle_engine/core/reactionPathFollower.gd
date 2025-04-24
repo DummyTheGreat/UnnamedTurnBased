@@ -1,12 +1,16 @@
 class_name ReactionPathFollower
 extends PathFollow2D
 
+## A ReactionPathFollower holds the data for the type of input displayed for a reaction on the
+## top reaction UI bar. It travels along the "ReactionPath" node.
+
+## References
 @onready var timer : Timer
 @onready var label : Label
 @onready var reactionArea : Area2D
 
-var attackVariant : String
-var bufferTime : float 
+var attackVariant : String ## The type of attack variant that the requested input should match to
+var bufferTime : float ## The amount of time it takes for this node to fully traverse the path
 
 
 func _init(p_attackVariant: String, p_bufferTime: float) -> void:

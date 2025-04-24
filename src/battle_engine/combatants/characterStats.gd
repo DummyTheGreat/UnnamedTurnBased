@@ -1,16 +1,18 @@
 class_name CharacterStats
 extends CharacterBody2D
 
-@export var max_health: int = 20
-@export var current_health: int = 20
-@export var base_damage: int = 5
-@export var action_cooldown: int = 3
-@export var skill_points: int = 10
-@export var speed: int = 10
-@export var comboChains: Array[Combo] = []
-@export var characterName: String = ""
+## Parent node of combatant types for defining their stats and identifiers
 
-var combatID : int
+@export var max_health: int = 20
+@export var current_health: int = 20 ## Cannot be greater than max_health
+@export var base_damage: int = 5 ## Scaled by modifiers
+@export var action_cooldown: int = 3 ## Deprecated
+@export var skill_points: int = 10 ## The number of available skill points to be use in a battle
+@export var speed: int = 10 ## Base speed
+@export var comboChains: Array[Combo] = [] ## A list of all combos available to the character
+@export var characterName: String = "" ## In-game character name for display
+
+var combatID : int ## Unique identifier used in combat
 
 func _init() -> void:
 	combatID = Globals.combatantID

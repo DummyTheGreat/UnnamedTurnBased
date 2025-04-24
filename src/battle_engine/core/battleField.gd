@@ -1,5 +1,8 @@
 extends Node2D
 
+## The Battle "Field" is the node that holds and controls all of the combatants 
+## in the battle
+
 ## References
 @onready var rotationAngle : float
 @onready var camera = $"../BattleCamera"

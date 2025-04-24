@@ -1,31 +1,9 @@
 class_name Enemy
 extends CharacterStats
 
-var actionTimer = null
-var actionBar = null
 var healthBar = null
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	# Action Timer
-	actionTimer = Timer.new()
-	actionTimer.name = "ActionTimer"
-	actionTimer.wait_time = self.action_cooldown
-	actionTimer.timeout.connect(_action)
-	self.add_child(actionTimer)
-	actionTimer.start()
-	
-	# Action Bar
-	actionBar = TextureProgressBar.new()
-	actionBar.name = "ActionBar"
-	
-	var action_bar_blue = Image.new()
-	action_bar_blue.load("res://assets/action_bar.png")
-	var t = ImageTexture.create_from_image(action_bar_blue)
-	
-	actionBar.texture_progress = t
-	actionBar.scale = Vector2(0.2, 0.2)
-	actionBar.set_position(Vector2(-7, -11))
-	self.add_child(actionBar)
 	
 	# Health Bar
 	healthBar = TextureProgressBar.new()
@@ -65,11 +43,5 @@ func _assess_targets(targets):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var percentTime = (actionTimer.wait_time - actionTimer.time_left) / actionTimer.wait_time
-	actionBar.value = roundi(percentTime * actionBar.max_value)
-	if actionBar.value == actionBar.max_value:
-		actionTimer.stop()
-		self._action()
-		actionTimer.start()
-		
-	healthBar.value = self.current_health
+	if self.current_health != healthBar.value:	
+		healthBar.value = self.current_health

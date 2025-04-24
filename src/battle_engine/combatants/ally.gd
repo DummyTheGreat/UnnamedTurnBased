@@ -1,28 +1,29 @@
 class_name Ally
 extends CharacterStats
 
+## An Ally as any combatant that the player is able to take control of during battle
+
+## References
 @onready var directionRay = $RayCast2D
 @onready var cameraFocus : CameraFocus = $"../../../BattleCamera/CenterFocus"
 @onready var collisionShape = $CollisionShape2D
 
-var actionTimer = null
-var actionBar = null
-var healthBar = null
+var isAttacking = false ## True if this ally is currently engaging in a combo or attack
 
-var isAttacking = false
+var acceleration = 1 ## Animation movement acceleration
 
-var acceleration = 1
+var collisionTarget = null ## Target being collided with in combat
 
-var collisionTarget = null
+var overlappingCollisionArea : Area2D = null ## 
 
-var overlappingCollisionArea : Area2D = null
-
+## Emits on collision with another combatant
+## Emission recieved by (battleField.gd)
 signal target_updated()
 
 func _ready():
 
 	# Health Bar
-	healthBar = TextureProgressBar.new()
+	var healthBar = TextureProgressBar.new()
 	healthBar.name = "HealthBar"
 	
 	var health_bar_green = Image.new()
