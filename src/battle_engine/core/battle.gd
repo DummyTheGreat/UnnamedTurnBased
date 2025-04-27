@@ -104,10 +104,10 @@ func _ready():
 	# Populate turn order UI
 	for entry in speedMap:
 		var labelChild = Label.new()
-		var combatantName = combatants[combatants.find_custom(
+		var combatant = combatants[combatants.find_custom(
 			func(combatant): return combatant.combatID == entry.id
-			)].characterName
-		labelChild.text = str(combatantName)
+			)]
+		labelChild.text = str(combatant.characterName) + str(combatant.actionValue)
 		turnOrder.add_child(labelChild)
 		
 	var nextCombatant = getNextCombatant()

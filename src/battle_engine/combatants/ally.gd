@@ -22,6 +22,8 @@ signal target_updated()
 
 func _ready():
 
+	super._ready()
+	
 	# Health Bar
 	var healthBar = TextureProgressBar.new()
 	healthBar.name = "HealthBar"

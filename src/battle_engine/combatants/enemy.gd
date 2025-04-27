@@ -5,6 +5,7 @@ var healthBar = null
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	
+	super._ready()
 	# Health Bar
 	healthBar = TextureProgressBar.new()
 	healthBar.name = "HealthBar"
