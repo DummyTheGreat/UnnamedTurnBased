@@ -115,7 +115,6 @@ shape = SubResource("RectangleShape2D_qxmty")
 [node name="Enemies" type="Node2D" parent="Field"]
 
 [node name="TestEnemy1" type="CharacterBody2D" parent="Field/Enemies" groups=["Combatants", "Enemies"]]
-visible = false
 script = ExtResource("4_7bqa5")
 speed = 12
 characterName = "EnemyOne"

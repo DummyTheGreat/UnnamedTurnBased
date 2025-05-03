@@ -22,4 +22,18 @@ func _init() -> void:
 	actionGauge = defaultActionGauge
 
 func _ready() -> void:
+	characterTurn.connect(self.get_parent().get_parent().get_parent().characterTurn)
 	actionValue = actionGauge / speed
+	
+func turnPassed() -> void:
+	if actionGauge >= 0 :
+		actionGauge -= speed
+	if speed != 0 :
+		actionValue = actionGauge / speed
+
+func actionAdvanceGauge() -> void:
+	turnPassed()
+	if(actionGauge <= 0):
+		characterTurn.emit(self)
+
+signal characterTurn()

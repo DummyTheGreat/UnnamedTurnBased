@@ -8,6 +8,7 @@ extends CharacterStats
 @onready var cameraFocus : CameraFocus = $"../../../BattleCamera/CenterFocus"
 @onready var collisionShape = $CollisionShape2D
 
+var movementSpd = 0 ##spd
 var isAttacking = false ## True if this ally is currently engaging in a combo or attack
 
 var acceleration = 1 ## Animation movement acceleration
@@ -63,7 +64,6 @@ func _action():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	
 	# temporary until all allies have ray
 	var collider = directionRay.get_collider() if directionRay != null else null
 		
@@ -78,12 +78,12 @@ func _process(delta):
 		
 		target_updated.emit()
 		
-	speed = velocity.length()
+	movementSpd = velocity.length()
 
-	if speed > 0:
+	if movementSpd > 0:
 		velocity *= acceleration
-
-	if speed < 0.01:
+#
+	if movementSpd < 0.01:
 		velocity = Vector2(0, 0)
 		acceleration = 1
 

@@ -15,14 +15,28 @@ var selectedAlly = null ## The ally combatant that the player is currently in co
 var actionState = "actionSelect" ## The state value for the battle's state machine
 var selectedEnemy = null ## The enemy which the player is targeting
 var playerAction : bool = false ## True if it is the player's (ally's) turn, false if enemy's turn
+var enemyAction : bool = false ## True if it is the enemy's (enemy's) turn
 var comboIndex = 0 ## The stage of the current combo in execution
 var selectedComboChain = null ## The combo chain selected to be executed for the turn
 var speedMap : Array[TurnOrder] = [] ## The list for tracking the current order of combatant turns
 var returnPosition : Vector2 = Vector2(0, 0) ## The position which an ally or enemy returns after executing their turn
 
+
+signal actionGaugeAdvance()
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
 func _customSpeedSort(a : TurnOrder, b : TurnOrder):
 		return (a.speed > b.speed)
+
+func characterTurn(actingCharacter: CharacterStats):
+	if actingCharacter is Ally:
+		selectedAlly = actingCharacter
+		playerAction = true
+		selectedComboChain = actingCharacter.comboChains[0]
+	if actingCharacter is Enemy:
+		selectedEnemy = actingCharacter
+		enemyAction = true
+	
+	print(actingCharacter.name)
 
 ## *Signal Function*
 ## Emits when overlappingCollisionArea "body_entered" signal is triggered in ally.gd (built-in node signal)
@@ -77,7 +91,7 @@ func _ready():
 	# populate allies and enemies groups here, temporarily static
 	var cameraHeight : float = 108 * 2
 	assert(allies.size() != 0)
-
+	
 	var spacing : float = cameraHeight / allies.size()
 	for i in range(allies.size()):
 		var pos = Vector2(-100, spacing - spacing * i)
@@ -89,6 +103,9 @@ func _ready():
 		enemies[i].translate(pos)
 		
 	var combatants = get_tree().get_nodes_in_group("Combatants")
+	
+	for combatant in combatants:
+		actionGaugeAdvance.connect(combatant.actionAdvanceGauge)
 				
 	# TODO: Chnage this to use the Combatants group
 	# Set initial turn order
@@ -108,23 +125,24 @@ func _ready():
 			func(combatant): return combatant.combatID == entry.id
 			)]
 		labelChild.text = str(combatant.characterName) + str(combatant.actionValue)
+		
 		turnOrder.add_child(labelChild)
 		
-	var nextCombatant = getNextCombatant()
-	if nextCombatant is Ally:
-		playerAction = true
-		selectedAlly = nextCombatant
-		selectedAlly.find_child('Sprite2D').material = selectShader
-	else:
-		playerAction = false
-		selectedEnemy = nextCombatant
+	#var nextCombatant = getNextCombatant()
+	#if nextCombatant is Ally:
+		#playerAction = true
+		#selectedAlly = nextCombatant
+		#selectedAlly.find_child('Sprite2D').material = selectShader
+	#else:
+		#playerAction = false
+		#selectedEnemy = nextCombatant
 		
 			
 			
 func _process(delta):
 	
 	if playerAction:
-	
+		
 		if Input.is_action_just_pressed("interact"):
 			match actionState:
 				"actionSelect":
@@ -190,6 +208,8 @@ func _process(delta):
 			selectedAlly.global_position = returnPosition
 			
 				
-	else:
+	elif enemyAction and !playerAction:
 		# Enemy turn
 		pass
+	else:
+		actionGaugeAdvance.emit()

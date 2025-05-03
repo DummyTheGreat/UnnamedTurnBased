@@ -6,7 +6,6 @@ class_name Combo
 
 @export var comboList : Array[CombatMove] ## A list of ComboMoves
 
-var placeholderMoveOne = preload("res://src/battle_engine/resources/moves/sword_slash.tres")
 
 func _init(cList: Array[CombatMove] = []):
 	comboList = cList
