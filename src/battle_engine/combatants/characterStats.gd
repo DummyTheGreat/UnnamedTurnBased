@@ -36,4 +36,7 @@ func actionAdvanceGauge() -> void:
 	if(actionGauge <= 0):
 		characterTurn.emit(self)
 
+func turnEndActionGauge() -> void:
+	actionGauge += defaultActionGauge
+
 signal characterTurn()

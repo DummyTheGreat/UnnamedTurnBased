@@ -23,6 +23,8 @@ var returnPosition : Vector2 = Vector2(0, 0) ## The position which an ally or en
 
 
 signal actionGaugeAdvance()
+
+signal turnEndActionGauge()
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
 func _customSpeedSort(a : TurnOrder, b : TurnOrder):
 		return (a.speed > b.speed)
@@ -142,7 +144,11 @@ func _ready():
 func _process(delta):
 	
 	if playerAction:
-		
+		if Input.is_action_just_pressed("move_left"):
+			playerAction = false
+			print(selectedAlly.name + " moved")
+			selectedAlly.turnEndActionGauge()
+			pass
 		if Input.is_action_just_pressed("interact"):
 			match actionState:
 				"actionSelect":
@@ -210,6 +216,10 @@ func _process(delta):
 				
 	elif enemyAction and !playerAction:
 		# Enemy turn
-		pass
+		if Input.is_action_just_pressed("move_left"):
+			enemyAction = false
+			print(selectedEnemy.name + " moved")
+			selectedEnemy.turnEndActionGauge()
+			pass
 	else:
 		actionGaugeAdvance.emit()
