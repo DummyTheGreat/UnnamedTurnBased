@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_5kvib")
+name = "Sword Slash"
 weapon = 0
 damage = 4
-attackVariant = 0
+attackVariant = "slash"
 playerSpeed = 300
 targetVelocity = Vector2(0, 0)
 reactionTime = 1.0
-distance = 0.0

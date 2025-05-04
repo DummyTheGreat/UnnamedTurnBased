@@ -66,7 +66,6 @@ shape = SubResource("RectangleShape2D_84e7o")
 layout_mode = 2
 
 [node name="BattleCamera" type="Camera2D" parent="."]
-offset = Vector2(192, 108)
 zoom = Vector2(2, 2)
 script = ExtResource("6_qwkl0")
 

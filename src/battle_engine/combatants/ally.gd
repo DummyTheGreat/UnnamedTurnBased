@@ -51,12 +51,17 @@ func _ready():
 	# Add to tree
 	self.add_child(overlappingCollisionArea)
 	overlappingCollisionArea.add_child(areaCollision)
-		
-	comboChains = [
+	
+	self.moves = [
+		load("res://src/battle_engine/resources/moves/sword_pierce.tres"),
+		load("res://src/battle_engine/resources/moves/sword_slash.tres")
+	]
+	
+	self.comboChains = [
 		load("res://src/battle_engine/resources/combos/swordSlashDouble.tres"),
 		load("res://src/battle_engine/resources/combos/sword_0_2.tres")
 	]
-		
+			
 
 func _action():
 	pass

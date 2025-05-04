@@ -6,4 +6,5 @@
 
 [resource]
 script = ExtResource("2_au6b5")
+name = "Double Slash"
 comboList = Array[ExtResource("1_3eb0d")]([ExtResource("2_2cek8"), ExtResource("2_2cek8")])

@@ -26,7 +26,6 @@ func _ready() -> void:
 	timer.one_shot = true
 	
 	label = Label.new()
-
 	label.text = InputMap.action_get_events(attackVariant)[0].as_text().split(" ")[0]
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

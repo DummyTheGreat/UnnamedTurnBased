@@ -7,4 +7,5 @@
 
 [resource]
 script = ExtResource("2_6pl6g")
+name = "Slice & Skewer"
 comboList = Array[ExtResource("1_045tw")]([ExtResource("2_6ppbt"), ExtResource("3_x5588")])

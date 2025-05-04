@@ -1,6 +1,7 @@
 class_name Enemy
 extends CharacterStats
 
+
 var healthBar = null
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -20,6 +21,16 @@ func _ready():
 	healthBar.scale = Vector2(0.2, 0.2)
 	healthBar.set_position(Vector2(-7, -14))
 	self.add_child(healthBar)
+	
+	self.moves = [
+		load("res://src/battle_engine/resources/moves/sword_pierce.tres"),
+		load("res://src/battle_engine/resources/moves/sword_slash.tres")
+	]
+	
+	self.comboChains = [
+		load("res://src/battle_engine/resources/combos/swordSlashDouble.tres"),
+		load("res://src/battle_engine/resources/combos/sword_0_2.tres")
+	]
 	
 
 func _action():

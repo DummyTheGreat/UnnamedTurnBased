@@ -11,15 +11,23 @@ extends Node2D
 ## Load shaders
 @onready var selectShader = preload("res://assets/shaders/allySelectedShader.tres")
 
+## Scenes
+@onready var selectionUI = preload("res://src/battle_engine/core/SelectionUI.tscn")
+
 var selectedAlly = null ## The ally combatant that the player is currently in control of
 var actionState = "actionSelect" ## The state value for the battle's state machine
 var selectedEnemy = null ## The enemy which the player is targeting
 var playerAction : bool = false ## True if it is the player's (ally's) turn, false if enemy's turn
 var enemyAction : bool = false ## True if it is the enemy's (enemy's) turn
 var comboIndex = 0 ## The stage of the current combo in execution
-var selectedComboChain = null ## The combo chain selected to be executed for the turn
+var selectedCombo : Combo ## The combo chain selected to be executed for the turn
+var selectedMove : CombatMove  ## The move selected to be executed for the turn
 var speedMap : Array[TurnOrder] = [] ## The list for tracking the current order of combatant turns
 var returnPosition : Vector2 = Vector2(0, 0) ## The position which an ally or enemy returns after executing their turn
+var actionType : String
+
+signal resetBattleCamera()
+signal resetSelectionUI()
 
 
 signal actionGaugeAdvance()
@@ -33,7 +41,7 @@ func characterTurn(actingCharacter: CharacterStats):
 	if actingCharacter is Ally:
 		selectedAlly = actingCharacter
 		playerAction = true
-		selectedComboChain = actingCharacter.comboChains[0]
+		selectedCombo = actingCharacter.comboChains[0]
 	if actingCharacter is Enemy:
 		selectedEnemy = actingCharacter
 		enemyAction = true
@@ -47,17 +55,40 @@ func characterTurn(actingCharacter: CharacterStats):
 func _process_damage(body: Node2D, damage: int):
 	body.current_health -= damage
 	pass
+	
+## *Signal Function*
+## Emits when a selection is made from SelectionUI (Button press)
+func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
+	var list : Array
+	if selectionChoice == "moves":
+		list = selectedAlly.moves
+	elif selectionChoice == "combos":
+		list = selectedAlly.comboChains
+		
+	var choice = list[
+		list.find_custom(
+			func(item): return item.name == listChoice
+		)
+	]
+	if choice is Combo:
+		actionType = "combo"
+		selectedCombo = choice
+	elif choice is CombatMove:
+		actionType = "move"
+		selectedMove = choice
+	
+	actionState = "targetSelect"
 
 ## Gets a list of the combatants in the battle field and determines the next one to take turn
 ## @return - A reference to the node of the next combatant to take turn
 func getNextCombatant():
 	
 	var combatants = get_tree().get_nodes_in_group("Combatants")
-	var nextCombatant = combatants[combatants.find_custom(
-		func(combatant): return combatant.combatID == speedMap[0].id
-		)]
-	# TODO: Temporary, will need to be changed so that the player can select a combo
-	selectedComboChain = nextCombatant.comboChains[0]
+	var nextCombatant = combatants[
+		combatants.find_custom(
+			func(combatant): return combatant.combatID == speedMap[0].id
+		)
+	]
 	return nextCombatant
 	
 ## Handles the user input during a quick-time combo string 
@@ -70,7 +101,7 @@ func processComboInput(attackVariant: String, skillPointsUsed: int):
 	if len(overlaps) > 0:
 		
 		if (attackVariant == overlaps[0].get_parent().attackVariant):
-			var currMove : CombatMove = selectedComboChain.comboList[comboIndex]
+			var currMove : CombatMove = selectedCombo.comboList[comboIndex]
 			selectedAlly.skill_points -= skillPointsUsed
 			
 			var vel = Vector2(selectedEnemy.global_position - selectedAlly.global_position)
@@ -90,19 +121,21 @@ func processComboInput(attackVariant: String, skillPointsUsed: int):
 
 func _ready():
 	
+	resetBattleCamera.connect(camera.doCameraReset)
+	
 	# populate allies and enemies groups here, temporarily static
 	var cameraHeight : float = 108 * 2
 	assert(allies.size() != 0)
 	
 	var spacing : float = cameraHeight / allies.size()
 	for i in range(allies.size()):
-		var pos = Vector2(-100, spacing - spacing * i)
-		allies[i].translate(pos)
+		var pos = Vector2(-100 , spacing - spacing * i)
+		allies[i].global_position = pos
 
 	spacing = cameraHeight / enemies.size()
 	for i in range(enemies.size()):
 		var pos = Vector2(100, spacing / 2 - spacing * i)
-		enemies[i].translate(pos)
+		enemies[i].global_position = pos
 		
 	var combatants = get_tree().get_nodes_in_group("Combatants")
 	
@@ -130,35 +163,30 @@ func _ready():
 		
 		turnOrder.add_child(labelChild)
 		
-	#var nextCombatant = getNextCombatant()
-	#if nextCombatant is Ally:
-		#playerAction = true
-		#selectedAlly = nextCombatant
-		#selectedAlly.find_child('Sprite2D').material = selectShader
-	#else:
-		#playerAction = false
-		#selectedEnemy = nextCombatant
+	var nextCombatant = getNextCombatant()
+	if nextCombatant is Ally:
+		playerAction = true
+		selectedAlly = nextCombatant
 		
-			
+		var uiInstance = selectionUI.instantiate()
+		resetSelectionUI.connect(uiInstance.resetUI)
+		selectedAlly.add_child(uiInstance)
+		selectedAlly.find_child('Sprite2D').material = selectShader
+	else:
+		playerAction = false
+		selectedEnemy = nextCombatant
+					
 			
 func _process(delta):
 	
 	if playerAction:
-		if Input.is_action_just_pressed("move_left"):
-			playerAction = false
-			print(selectedAlly.name + " moved")
-			selectedAlly.turnEndActionGauge()
-			pass
-		if Input.is_action_just_pressed("interact"):
-			match actionState:
-				"actionSelect":
-					selectedEnemy = enemies[0] # Temporary, change to dynamic selector based on history
-					selectedEnemy.find_child('Sprite2D').material = selectShader
-					actionState = "targetSelect"
-				"targetSelect":
-					actionState = "combatStart"
+
+		if actionState == "actionSelect":
+			## TODO: Temporary, change to dynamic selector based on history (last turn)
+			selectedEnemy = enemies[0]
 					
 		if actionState == "targetSelect":
+			
 			var enemyIndex = selectedEnemy.get_index()
 			var nextIndex = enemyIndex
 			
@@ -170,6 +198,9 @@ func _process(delta):
 			selectedEnemy.find_child('Sprite2D').material = null
 			selectedEnemy = enemies[nextIndex]
 			selectedEnemy.find_child('Sprite2D').material = selectShader
+			
+			if Input.is_action_just_pressed("interact"):
+				actionState = "combatStart"
 			
 		if actionState == "combatStart":
 			
@@ -188,16 +219,19 @@ func _process(delta):
 				actionState = "combatExecution"
 				# Add inputs to reaction bar
 				var timeSummation: float = 0
-				print(selectedComboChain.comboList[0])
-				for move in selectedComboChain.comboList:
-					timeSummation += move.reactionTime
-					var follower = ReactionPathFollower.new(move.attackVariant, timeSummation)
-					reactionPath.add_child(follower)
+				if selectedCombo:
+					for move in selectedCombo.comboList:
+						timeSummation += move.reactionTime
+						var follower = ReactionPathFollower.new(move.attackVariant, timeSummation)
+						reactionPath.add_child(follower)
+				if selectedMove:
+					timeSummation += selectedMove.reactionTime
+					reactionPath.add_child(ReactionPathFollower.new(selectedMove.attackVariant, timeSummation))
 				
 		
 		if actionState == "combatExecution":
 			
-			# Can probably be optimized as a signal
+			## TODO: Can probably be optimized as a signal
 			if len(reactionPath.get_children()) == 2:
 				actionState = "combatReset"
 					
@@ -212,6 +246,13 @@ func _process(delta):
 				
 		if actionState == "combatReset":
 			selectedAlly.global_position = returnPosition
+			selectedAlly.velocity = Vector2(0, 0)
+			selectedAlly.turnEndActionGauge()
+			selectedCombo = null
+			selectedMove = null
+			resetBattleCamera.emit()
+			resetSelectionUI.emit()
+			actionState = "actionSelect"
 			
 				
 	elif enemyAction and !playerAction:

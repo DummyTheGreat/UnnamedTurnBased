@@ -8,6 +8,16 @@ extends Camera2D
 var zoomTicks = 0 ## A decrementing value used to countdown how long the camera should zoom in
 var speed : float = 5.0 ## I need to review what this does lol, something with lerp()
 
+## *Signal Function*
+## Called by battle.gd when a turn is ended
+func doCameraReset():
+	# Rinky Dink ass solution
+	self.global_position = Vector2(0, 0)
+	target.first = self
+	target.second = self
+	self.zoom = Vector2(2.0, 2.0)
+	
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.offset = Vector2(0, 0)
