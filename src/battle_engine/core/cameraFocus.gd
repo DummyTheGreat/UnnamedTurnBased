@@ -7,6 +7,14 @@ extends Marker2D
 @onready var first = self.get_parent() ## The first node to be used for finding the center point
 @onready var second = self.get_parent() ## The second node to be used for finding the center point
 
+## *Signal Function*
+## Emits from battle when enemy selections are made
+func updateTargetPoints(targetList : Array):
+	first = targetList[0]
+	second = targetList[1]
+	#temp
+	get_parent().zoomTicks = 100
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass

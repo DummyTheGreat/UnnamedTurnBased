@@ -4,8 +4,6 @@ extends CharacterStats
 ## An Ally as any combatant that the player is able to take control of during battle
 
 ## References
-@onready var directionRay = $RayCast2D
-@onready var cameraFocus : CameraFocus = $"../../../BattleCamera/CenterFocus"
 @onready var collisionShape = $CollisionShape2D
 
 var movementSpd = 0 ##spd
@@ -16,10 +14,6 @@ var acceleration = 1 ## Animation movement acceleration
 var collisionTarget = null ## Target being collided with in combat
 
 var overlappingCollisionArea : Area2D = null ## 
-
-## Emits on collision with another combatant
-## Emission recieved by (battleField.gd)
-signal target_updated()
 
 func _ready():
 
@@ -69,19 +63,6 @@ func _action():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	# temporary until all allies have ray
-	var collider = directionRay.get_collider() if directionRay != null else null
-		
-	if (collider != null and collider != collisionTarget):
-		
-		# Prevent endless loop into condition ^
-		collisionTarget = collider
-		
-		# Find midpoint, create temporary node at midpoint for camera to focus on
-		cameraFocus.first = self
-		cameraFocus.second = collider
-		
-		target_updated.emit()
 		
 	movementSpd = velocity.length()
 
