@@ -15,12 +15,14 @@ var collisionTarget = null ## Target being collided with in combat
 
 var overlappingCollisionArea : Area2D = null ## 
 
+var healthBar = null
+
 func _ready():
 
 	super._ready()
 	
 	# Health Bar
-	var healthBar = TextureProgressBar.new()
+	healthBar = TextureProgressBar.new()
 	healthBar.name = "HealthBar"
 	
 	var health_bar_green = Image.new()
@@ -78,3 +80,7 @@ func _process(delta):
 	for i in range(get_slide_collision_count() - 1):
 		var collision = get_slide_collision(i)
 		print(collision.get_collider())
+		
+	# Update health bar
+	if self.current_health != healthBar.value:	
+		healthBar.value = self.current_health

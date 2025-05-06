@@ -83,7 +83,8 @@ func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
 	selectedEnemy = enemies[0]
 	selectedEnemy.find_child('Sprite2D').material = selectShader
 	actionState = "targetSelect"
-	
+
+
 ## *Signal Function*
 ## Emit recieved from reactionPath.gd
 func beginCombatExecutionState(timeSummation: float) -> void:
@@ -93,6 +94,13 @@ func beginCombatExecutionState(timeSummation: float) -> void:
 ## Emit recieved from reactionPath.gd
 func endCombatExecutionState() -> void:
 	actionState = "combatReset"
+
+
+## Processes enemy turn. Takes target and move selection from enemy signal
+func processEnemyTurn(enemy, target, move:CombatMove):
+	print(enemy.name, " attacks ", target.name)
+	_process_damage(target, move.damage)
+
 
 ## Gets a list of the combatants in the battle field and determines the next one to take turn
 ## @return - A reference to the node of the next combatant to take turn
@@ -273,7 +281,9 @@ func _process(delta):
 		# Enemy turn
 		if Input.is_action_just_pressed("move_left"):
 			enemyAction = false
-			print(selectedEnemy.name + " moved")
+			# print(selectedEnemy.name + " moved")
+			# Enemy does its action
+			selectedEnemy._action()
 			selectedEnemy.turnEndActionGauge()
 			pass
 	else:

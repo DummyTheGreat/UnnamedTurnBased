@@ -3,9 +3,12 @@ extends CharacterStats
 
 
 var healthBar = null
+# Signals to get move and target from enemy
+signal enemySignal(enemy, target, move)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	
+	var battle = get_parent().get_parent().get_parent()
 	super._ready()
 	# Health Bar
 	healthBar = TextureProgressBar.new()
@@ -22,6 +25,9 @@ func _ready():
 	healthBar.set_position(Vector2(-7, -14))
 	self.add_child(healthBar)
 	
+	# Enemy signal processing
+	enemySignal.connect(battle.processEnemyTurn)
+	
 	self.moves = [
 		load("res://src/battle_engine/resources/moves/sword_pierce.tres"),
 		load("res://src/battle_engine/resources/moves/sword_slash.tres")
@@ -35,22 +41,14 @@ func _ready():
 
 func _action():
 	var target = self._assess_targets(self.owner.allies)
-	
+	# Randomly selects a move for now
+	var move = moves[randi() % moves.size()]
+	enemySignal.emit(self, target, move)
 	
 	
 func _assess_targets(targets):
-	
-	var maximum = 0.0
-	var target = 0
-
-	for i in range(len(targets)):
-		var damageFreq = float(targets[i].base_damage)# / float(targets[i].action_cooldown)
-		var vulnerability = float(targets[i].max_health) / float(targets[i].current_health)
-		if damageFreq + vulnerability > maximum:
-			maximum = damageFreq + vulnerability
-			target = i
-		
-	return targets[target]
+	# Random target selection
+	return targets[randi() % targets.size()]
 		
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
