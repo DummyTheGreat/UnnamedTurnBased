@@ -11,3 +11,4 @@ attackVariant = "pierce"
 playerSpeed = 500
 targetVelocity = Vector2(0, 0)
 reactionTime = 1.0
+minimumDistanceToTargets = 100

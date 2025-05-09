@@ -5,6 +5,7 @@ extends CharacterStats
 
 ## References
 @onready var collisionShape = $CollisionShape2D
+#@onready var animationPlayer : AnimationPlayer = $AnimationPlayer
 
 var movementSpd = 0 ##spd
 var isAttacking = false ## True if this ally is currently engaging in a combo or attack

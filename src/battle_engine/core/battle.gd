@@ -16,17 +16,18 @@ extends Node2D
 ## Scenes
 @onready var selectionUI = preload("res://src/battle_engine/core/SelectionUI.tscn")
 
-var selectedAlly = null ## The ally combatant that the player is currently in control of
-var actionState = "actionSelect" ## The state value for the battle's state machine
-var selectedEnemy = null ## The enemy which the player is targeting
+var selectedAlly : Ally = null ## The ally combatant that the player is currently in control of
+var actionState : String = "actionSelect" ## The state value for the battle's state machine
+var selectedEnemy : Enemy = null ## The enemy which the player is targeting
 var playerAction : bool = false ## True if it is the player's (ally's) turn, false if enemy's turn
 var enemyAction : bool = false ## True if it is the enemy's (enemy's) turn
-var comboIndex = 0 ## The stage of the current combo in execution
+var comboIndex : int = 0 ## The stage of the current combo in execution
 var selectedCombo : Combo ## The combo chain selected to be executed for the turn
-#var selectedMove : CombatMove  ## The move selected to be executed for the turn
+var currentMove : CombatMove ## The current move based on the comboIndex
 var speedMap : Array[TurnOrder] = [] ## The list for tracking the current order of combatant turns
 var returnPosition : Vector2 = Vector2(0, 0) ## The position which an ally or enemy returns after executing their turn
 var actionType : String
+var tweens : Array[Tween] ## A type of animation
 
 signal resetBattleCamera() ## Emits to battleCamera -> doCameraReset
 signal resetSelectionUI() ## Emits to selectionUI -> resetUI
@@ -119,25 +120,50 @@ func getNextCombatant():
 ## @param skillPointsUsed - The number of skill poitns to remove from the combatant
 func processComboInput(attackVariant: String, skillPointsUsed: int):
 	
-	var overlaps = reactionClickArea.get_overlapping_areas()
+	var queue = reactionClickArea.get_overlapping_areas()	
 		
-	if len(overlaps) > 0:
+	if len(queue) > 0:
 		
-		if (attackVariant == overlaps[0].get_parent().attackVariant):
-			var currMove : CombatMove = selectedCombo.comboList[comboIndex]
+		#temp - get next move's distance boundary
+		var nextMoveDistance : int
+		if comboIndex + 1 < selectedCombo.comboList.size():
+			nextMoveDistance = selectedCombo.comboList[comboIndex + 1].minimumDistanceToTargets
+		
+		if (attackVariant == queue[0].get_parent().attackVariant):
+			var currMove : CombatMove = currentMove
 			selectedAlly.skill_points -= skillPointsUsed
+			# Directional vector of ally and enemy positions
+			var dirVec = Vector2(selectedAlly.position - selectedEnemy.position)
+			# Find endPos by vector equation of the direction line by scalar t
+			var t : float = 2.0
+			var endPos = Vector2(
+				selectedAlly.position.x + t * (selectedEnemy.position.x - selectedAlly.position.x),
+				selectedAlly.position.y + t * (selectedEnemy.position.y - selectedAlly.position.y)
+			)
+			# I'm gonna tweeeen
+			var allyTween = get_tree().create_tween()
+			allyTween.set_ease(Tween.EASE_OUT)
+			allyTween.tween_property(selectedAlly, "position", endPos, 1).set_trans(Tween.TRANS_EXPO)
+			tweens.append(allyTween)
 			
-			var vel = Vector2(selectedEnemy.global_position - selectedAlly.global_position)
-			var normalizedVelocity = vel / vel.length()
+			var prevPos = selectedEnemy.position
+			var knockbackPos = Vector2(
+				selectedEnemy.position.x, selectedEnemy.position.y - 50
+			)
+
+			var enemyTween = get_tree().create_tween()
+			enemyTween.set_ease(Tween.EASE_OUT)
+			enemyTween.tween_property(selectedEnemy, "position", knockbackPos, 0.5).set_trans(Tween.TRANS_SINE)
+			enemyTween.tween_property(selectedEnemy, "position", prevPos, 0.5).set_trans(Tween.TRANS_BOUNCE)
+			tweens.append(enemyTween)
 			
-			selectedAlly.velocity = normalizedVelocity * currMove.playerSpeed
-			selectedAlly.acceleration = 0.99
-			# Disable collision mask that matches the collision layer of the enemy target
-			selectedAlly.collision_mask = 0b00
 			selectedAlly.isAttacking = true
 			# Connect to the selected ally's signal for overlapping collision detection
 			selectedAlly.overlappingCollisionArea.body_entered.connect(_process_damage.bind(currMove.damage))
+			# Move to next move in list
 			comboIndex += 1
+			if comboIndex < selectedCombo.comboList.size():
+				currentMove = selectedCombo.comboList[comboIndex]
 		else:
 			print("wrong!")
 			
@@ -167,6 +193,7 @@ func TargetSelectState():
 		processTargetSelectChange("move_up")
 	
 	if Input.is_action_just_pressed("interact"):
+		# Initialize a bunch of stuff for future states
 		var vel = Vector2(selectedEnemy.global_position - selectedAlly.global_position)
 		var normalizedVelocity = vel / vel.length()
 		returnPosition = selectedAlly.global_position
@@ -174,19 +201,22 @@ func TargetSelectState():
 		selectedAlly.find_child('Sprite2D').material = null
 		selectedEnemy.find_child('Sprite2D').material = null
 		targetUpdated.emit([selectedAlly, selectedEnemy])
+		comboIndex = 0
+		currentMove = selectedCombo.comboList[comboIndex]
 		actionState = "combatStart"
 		
 func CombatStartState():
 	## TODO: 100 is completely arbitrary at the moment
-	if Vector2(selectedEnemy.global_position - selectedAlly.global_position).length() <= 100:
+	if Vector2(
+		selectedEnemy.global_position - selectedAlly.global_position
+		).length() <= currentMove.minimumDistanceToTargets:
 		selectedAlly.velocity = Vector2(0, 0)
-		comboIndex = 0
 		# Add inputs to reaction bar
-		var timeSummation: float = 0
+		#var timeSummation: float = 0
 		queueInputsForReaction.emit(selectedCombo.comboList)
 		
 func CombatExecutionState():
-
+	
 	if Input.is_action_just_pressed("slash"):
 		processComboInput("slash", 2)
 		
@@ -197,6 +227,8 @@ func CombatExecutionState():
 		processComboInput("pierce", 3)
 		
 func CombatResetState():
+	for tw in tweens:
+		tw.kill()
 	selectedAlly.global_position = returnPosition
 	selectedAlly.velocity = Vector2(0, 0)
 	selectedAlly.turnEndActionGauge()
