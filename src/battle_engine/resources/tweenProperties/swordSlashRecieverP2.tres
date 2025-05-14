@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TweenProperty" load_steps=2 format=3 uid="uid://dqtumv461m1tq"]
+
+[ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_x1mew"]
+
+[resource]
+script = ExtResource("1_x1mew")
+property = "position"
+calcKey = "ShiftRecieverByDistance"
+calcArguments = [Vector2(0, 0)]
+duration = 0.5
+transition = 9
+metadata/_custom_type_script = "uid://1371cmni8esf"

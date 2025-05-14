@@ -1,6 +1,10 @@
-[gd_resource type="Resource" script_class="CombatMove" load_steps=2 format=3 uid="uid://bwlljbscq8vd7"]
+[gd_resource type="Resource" script_class="CombatMove" load_steps=6 format=3 uid="uid://bwlljbscq8vd7"]
 
 [ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatMove.gd" id="1_5kvib"]
+[ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_7xxb7"]
+[ext_resource type="Resource" uid="uid://bdpur8t0rbwdj" path="res://src/battle_engine/resources/tweenProperties/swordSlashAttackerP1.tres" id="2_7xxb7"]
+[ext_resource type="Resource" uid="uid://dqtumv461m1tq" path="res://src/battle_engine/resources/tweenProperties/swordSlashRecieverP2.tres" id="3_osvhi"]
+[ext_resource type="Resource" uid="uid://b007wmflohemn" path="res://src/battle_engine/resources/tweenProperties/swordSlashRecieverP1.tres" id="3_qlrtk"]
 
 [resource]
 script = ExtResource("1_5kvib")
@@ -12,3 +16,7 @@ playerSpeed = 300
 targetVelocity = Vector2(0, 0)
 reactionTime = 1.0
 minimumDistanceToTargets = 50
+attackerAnimationEase = 1
+attackerAnimationProperties = Array[ExtResource("1_7xxb7")]([ExtResource("2_7xxb7")])
+recieverAnimationEase = 0
+recieverAnimationProperties = Array[ExtResource("1_7xxb7")]([ExtResource("3_qlrtk"), ExtResource("3_osvhi")])

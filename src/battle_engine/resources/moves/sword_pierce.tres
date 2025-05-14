@@ -1,5 +1,6 @@
-[gd_resource type="Resource" script_class="CombatMove" load_steps=2 format=3 uid="uid://bxgdjxjytjte4"]
+[gd_resource type="Resource" script_class="CombatMove" load_steps=3 format=3 uid="uid://bxgdjxjytjte4"]
 
+[ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_ajakf"]
 [ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatMove.gd" id="1_fomwu"]
 
 [resource]
@@ -12,3 +13,7 @@ playerSpeed = 500
 targetVelocity = Vector2(0, 0)
 reactionTime = 1.0
 minimumDistanceToTargets = 100
+attackerAnimationEase = 0
+attackerAnimationProperties = Array[ExtResource("1_ajakf")]([])
+recieverAnimationEase = 0
+recieverAnimationProperties = Array[ExtResource("1_ajakf")]([])
