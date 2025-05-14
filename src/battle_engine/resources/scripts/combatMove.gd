@@ -13,19 +13,25 @@ class_name CombatMove
 @export var targetVelocity: Vector2 ## The velocity at which the opposing combatant is launched at (knockback)
 @export var reactionTime: float ## The duration of time the move takes to travel along ReactionPath
 @export var minimumDistanceToTargets: int ## How close the the user of the move has to their targets to execute the move
-var attackAnimationEase: Tween.EaseType
-var attackAnimationProperties : Array[TweenProperty]
+## movement animation
+@export var attackerAnimationEase: Tween.EaseType
+@export var attackerAnimationProperties : Array[TweenProperty]
+@export var recieverAnimationEase : Tween.EaseType
+@export var recieverAnimationProperties : Array[TweenProperty]
 
 func _init(
-	name = "",
-	weapon =0, 
-	damage = 1,
-	attackVariant = "slash", 
-	playerSpeed = 1, 
-	targetVelocity = Vector2(0, 0),
-	reactionTime = 1.0,
-	minimumDistanceToTargets = 100,
-	
+	name : String = "",
+	weapon : int = 0, 
+	damage : int = 1,
+	attackVariant : String = "slash", 
+	playerSpeed : int = 1, 
+	targetVelocity : Vector2 = Vector2(0, 0),
+	reactionTime : float = 1.0,
+	minimumDistanceToTargets : int = 100,
+	attackerAnimationEase : Tween.EaseType = Tween.EASE_IN_OUT,
+	attackAnimationProperties : Array[TweenProperty] = [],
+	recieverAnimationEase : Tween.EaseType = Tween.EASE_IN_OUT,
+	recieverAnimationProperties : Array[TweenProperty] = []
 	):
 	self.name = name
 	self.weapon = weapon
@@ -35,3 +41,7 @@ func _init(
 	self.targetVelocity = targetVelocity
 	self.reactionTime = reactionTime
 	self.minimumDistanceToTargets = minimumDistanceToTargets
+	self.attackerAnimationEase = attackerAnimationEase
+	self.attackerAnimationProperties = attackerAnimationProperties
+	self.recieverAnimationEase = recieverAnimationEase
+	self.recieverAnimationProperties = recieverAnimationProperties

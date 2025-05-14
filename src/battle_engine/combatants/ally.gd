@@ -49,14 +49,17 @@ func _ready():
 	self.add_child(overlappingCollisionArea)
 	overlappingCollisionArea.add_child(areaCollision)
 	
+	var move1 : CombatMove = load("res://src/battle_engine/resources/moves/sword_slash.tres")
+	#var property1 : TweenProperty = load("res://src/battle_engine/resources/tweenProperties/swordSlashAttackerP1.tres")
+	#move1.attackerAnimationProperties.append(property1)
 	self.moves = [
+		move1,
 		load("res://src/battle_engine/resources/moves/sword_pierce.tres"),
-		load("res://src/battle_engine/resources/moves/sword_slash.tres")
 	]
 	
 	self.comboChains = [
 		load("res://src/battle_engine/resources/combos/swordSlashDouble.tres"),
-		load("res://src/battle_engine/resources/combos/sword_0_2.tres")
+		load("res://src/battle_engine/resources/combos/sliceAndSkewer.tres")
 	]
 			
 

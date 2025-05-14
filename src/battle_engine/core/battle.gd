@@ -28,6 +28,7 @@ var speedMap : Array[TurnOrder] = [] ## The list for tracking the current order 
 var returnPosition : Vector2 = Vector2(0, 0) ## The position which an ally or enemy returns after executing their turn
 var actionType : String
 var tweens : Array[Tween] ## A type of animation
+var tweenCounter : int ## Track how many tweens have finished
 
 signal resetBattleCamera() ## Emits to battleCamera -> doCameraReset
 signal resetSelectionUI() ## Emits to selectionUI -> resetUI
@@ -49,7 +50,6 @@ func characterTurn(actingCharacter: CharacterStats):
 		selectedEnemy = actingCharacter
 		enemyAction = true
 	
-	print(actingCharacter.name)
 
 ## *Signal Function*
 ## Emits when overlappingCollisionArea "body_entered" signal is triggered in ally.gd (built-in node signal)
@@ -92,10 +92,15 @@ func beginCombatExecutionState(timeSummation: float) -> void:
 	actionState = "combatExecution"
 	
 ## *Signal Function*
+## Emit recieved from Tween.finished
+func tweenEnds() -> void:
+	tweenCounter += 1
+	
+## *Signal Function*
 ## Emit recieved from reactionPath.gd
 func endCombatExecutionState() -> void:
 	actionState = "combatReset"
-
+	
 
 ## Processes enemy turn. Takes target and move selection from enemy signal
 func processEnemyTurn(enemy, target, move:CombatMove):
@@ -115,6 +120,31 @@ func getNextCombatant():
 	]
 	return nextCombatant
 	
+## Handles movement tweening
+func handleMovementTween(primary : CharacterStats, secondary : CharacterStats, tweenProperties : Array[TweenProperty], easeType : Tween.EaseType) -> void:
+	if tweenProperties.is_empty():
+		return
+		
+	var tween = get_tree().create_tween()
+	tween.pause()
+	tween.set_ease(easeType)
+	for tProp in tweenProperties:
+		
+		var movementCall : Callable = tProp.calcDict[tProp.calcKey].bindv(tProp.calcArguments)
+		var finalValue
+		if movementCall.get_argument_count() == 2:
+			finalValue = movementCall.call(primary, secondary)
+		else:
+			finalValue = movementCall.call(primary)
+		tween.tween_property(
+			primary, 
+			tProp.property, 
+			finalValue, 
+			tProp.duration).set_trans(tProp.transition)
+			
+	tween.finished.connect(tweenEnds)		
+	tweens.append(tween)
+	
 ## Handles the user input during a quick-time combo string 
 ## @param attackVariant - The type of attack executed by the player determined by their input
 ## @param skillPointsUsed - The number of skill poitns to remove from the combatant
@@ -130,36 +160,23 @@ func processComboInput(attackVariant: String, skillPointsUsed: int):
 			nextMoveDistance = selectedCombo.comboList[comboIndex + 1].minimumDistanceToTargets
 		
 		if (attackVariant == queue[0].get_parent().attackVariant):
-			var currMove : CombatMove = currentMove
+			var move : CombatMove = currentMove
+			## NOTE: Temporary assignments, will need to be dynamically assigned
+			var attacker = selectedAlly
+			var reciever = selectedEnemy
+			# Reduce skills points from gauge
 			selectedAlly.skill_points -= skillPointsUsed
-			# Directional vector of ally and enemy positions
-			var dirVec = Vector2(selectedAlly.position - selectedEnemy.position)
-			# Find endPos by vector equation of the direction line by scalar t
-			var t : float = 2.0
-			var endPos = Vector2(
-				selectedAlly.position.x + t * (selectedEnemy.position.x - selectedAlly.position.x),
-				selectedAlly.position.y + t * (selectedEnemy.position.y - selectedAlly.position.y)
-			)
-			# I'm gonna tweeeen
-			var allyTween = get_tree().create_tween()
-			allyTween.set_ease(Tween.EASE_OUT)
-			allyTween.tween_property(selectedAlly, "position", endPos, 1).set_trans(Tween.TRANS_EXPO)
-			tweens.append(allyTween)
-			
-			var prevPos = selectedEnemy.position
-			var knockbackPos = Vector2(
-				selectedEnemy.position.x, selectedEnemy.position.y - 50
-			)
 
-			var enemyTween = get_tree().create_tween()
-			enemyTween.set_ease(Tween.EASE_OUT)
-			enemyTween.tween_property(selectedEnemy, "position", knockbackPos, 0.5).set_trans(Tween.TRANS_SINE)
-			enemyTween.tween_property(selectedEnemy, "position", prevPos, 0.5).set_trans(Tween.TRANS_BOUNCE)
-			tweens.append(enemyTween)
+			handleMovementTween(attacker, reciever, move.attackerAnimationProperties, move.attackerAnimationEase)
+			handleMovementTween(reciever, attacker, move.recieverAnimationProperties, move.recieverAnimationEase)
+			
+			# Run tweens
+			for tween in tweens:
+				tween.play()
 			
 			selectedAlly.isAttacking = true
 			# Connect to the selected ally's signal for overlapping collision detection
-			selectedAlly.overlappingCollisionArea.body_entered.connect(_process_damage.bind(currMove.damage))
+			selectedAlly.overlappingCollisionArea.body_entered.connect(_process_damage.bind(move.damage))
 			# Move to next move in list
 			comboIndex += 1
 			if comboIndex < selectedCombo.comboList.size():
@@ -227,15 +244,16 @@ func CombatExecutionState():
 		processComboInput("pierce", 3)
 		
 func CombatResetState():
-	for tw in tweens:
-		tw.kill()
-	selectedAlly.global_position = returnPosition
-	selectedAlly.velocity = Vector2(0, 0)
-	selectedAlly.turnEndActionGauge()
-	selectedCombo = null
-	resetBattleCamera.emit()
-	resetSelectionUI.emit()
-	actionState = "actionSelect"
+	if tweenCounter == tweens.size():
+		for tw in tweens:
+			tw.kill()
+		selectedAlly.global_position = returnPosition
+		selectedAlly.velocity = Vector2(0, 0)
+		selectedAlly.turnEndActionGauge()
+		selectedCombo = null
+		resetBattleCamera.emit()
+		resetSelectionUI.emit()
+		actionState = "actionSelect"
 
 
 func _ready():
