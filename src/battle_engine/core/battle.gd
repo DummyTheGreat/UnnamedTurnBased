@@ -122,6 +122,9 @@ func getNextCombatant():
 	
 ## Handles movement tweening
 func handleMovementTween(primary : CharacterStats, secondary : CharacterStats, tweenProperties : Array[TweenProperty], easeType : Tween.EaseType) -> void:
+	if tweenProperties.is_empty():
+		return
+		
 	var tween = get_tree().create_tween()
 	tween.pause()
 	tween.set_ease(easeType)
