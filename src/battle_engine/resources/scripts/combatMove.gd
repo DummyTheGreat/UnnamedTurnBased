@@ -6,6 +6,7 @@ class_name CombatMove
 ## various properties for configuration
 
 @export var name: String ## Name of the move
+## NOTE: Maybe create separate classes for each weapon if things get crazy
 @export var weapon: int ## The ID value for the type of weapon used in the move
 @export var damage: int ## The base damage value of the move
 @export var attackVariant: String ## The type of attack used with the weapon (Slash, Pierce, Strike)
@@ -13,6 +14,7 @@ class_name CombatMove
 @export var targetVelocity: Vector2 ## The velocity at which the opposing combatant is launched at (knockback)
 @export var reactionTime: float ## The duration of time the move takes to travel along ReactionPath
 @export var minimumDistanceToTargets: int ## How close the the user of the move has to their targets to execute the move
+@export var maxTargets : int ## How many targets can be selected
 ## movement animation
 @export var attackerAnimationEase: Tween.EaseType
 @export var attackerAnimationProperties : Array[TweenProperty]
@@ -28,6 +30,7 @@ func _init(
 	targetVelocity : Vector2 = Vector2(0, 0),
 	reactionTime : float = 1.0,
 	minimumDistanceToTargets : int = 100,
+	maxTargets : int = 1,
 	attackerAnimationEase : Tween.EaseType = Tween.EASE_IN_OUT,
 	attackAnimationProperties : Array[TweenProperty] = [],
 	recieverAnimationEase : Tween.EaseType = Tween.EASE_IN_OUT,
@@ -41,6 +44,7 @@ func _init(
 	self.targetVelocity = targetVelocity
 	self.reactionTime = reactionTime
 	self.minimumDistanceToTargets = minimumDistanceToTargets
+	self.maxTargets = maxTargets
 	self.attackerAnimationEase = attackerAnimationEase
 	self.attackerAnimationProperties = attackerAnimationProperties
 	self.recieverAnimationEase = recieverAnimationEase

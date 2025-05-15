@@ -47,6 +47,6 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if timer.time_left <= 1:
-		self.progress_ratio = 1 - timer.time_left
+		self.progress_ratio = 1 - (1 / timer.wait_time) * timer.time_left
 	if self.progress_ratio == 1.0:
 		self.queue_free()

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CombatMove" load_steps=3 format=3 uid="uid://dykulo0wqntba"]
+
+[ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_4udef"]
+[ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatMove.gd" id="2_voypj"]
+
+[resource]
+script = ExtResource("2_voypj")
+name = "Dual Shot"
+weapon = 2
+damage = 2
+attackVariant = "strike"
+playerSpeed = 0
+targetVelocity = Vector2(0, 0)
+reactionTime = 0.5
+minimumDistanceToTargets = 200
+maxTargets = 2
+attackerAnimationEase = 0
+attackerAnimationProperties = Array[ExtResource("1_4udef")]([])
+recieverAnimationEase = 0
+recieverAnimationProperties = Array[ExtResource("1_4udef")]([])
+metadata/_custom_type_script = "uid://ba5a0kqfel84g"

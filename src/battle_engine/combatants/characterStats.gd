@@ -15,6 +15,8 @@ extends CharacterBody2D
 @export var actionGauge: int  ##Base Action Gauge
 @export var actionValue: int  ##Base Action Value
 
+var targetted : bool = false
+
 var combatID : int ## Unique identifier used in combat
 
 func _init() -> void:
