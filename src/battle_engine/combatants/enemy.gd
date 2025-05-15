@@ -35,7 +35,7 @@ func _ready():
 	
 	self.comboChains = [
 		load("res://src/battle_engine/resources/combos/swordSlashDouble.tres"),
-		load("res://src/battle_engine/resources/combos/sword_0_2.tres")
+		load("res://src/battle_engine/resources/combos/sliceAndSkewer.tres")
 	]
 	
 

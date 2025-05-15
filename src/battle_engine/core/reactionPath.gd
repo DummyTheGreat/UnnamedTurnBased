@@ -7,11 +7,12 @@ signal initiateCombatExecution(timeSummation : float)
 ## Emitted by battle.gd during the CombatStart state
 func addFollowers(moveList : Array) -> void:
 	var timeSummation : float = 0
+	var prevFollower : ReactionPathFollower = null
 	for move in moveList:
-		timeSummation += move.reactionTime
-		var follower = ReactionPathFollower.new(move.attackVariant, timeSummation)
+		var follower = ReactionPathFollower.new(move.attackVariant, move.reactionTime, prevFollower)
 		self.add_child(follower)
-		child_order_changed.connect(handleFollowerRemoval)
+		prevFollower = follower
+	self.child_order_changed.connect(handleFollowerRemoval)
 	initiateCombatExecution.emit(timeSummation)
 
 ## *Signal Function*
