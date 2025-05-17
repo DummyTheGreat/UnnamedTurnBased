@@ -3,7 +3,9 @@ extends Node2D
 ## References
 @onready var allies = $Field/Allies.get_children()
 @onready var enemies = $Field/Enemies.get_children()
+@onready var field = $Field
 @onready var camera = $BattleCamera
+@onready var cameraFocus = $BattleCamera/CenterFocus
 @onready var reactionPath = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath
 @onready var reactionClickArea = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath/ClickArea
 @onready var turnOrder = $UILayer/BattleUI/HorizontalContainer/MarginContainer/TurnOrderVisual
@@ -14,23 +16,27 @@ extends Node2D
 ## Scenes
 @onready var selectionUI = preload("res://src/battle_engine/core/SelectionUI.tscn")
 
-var selectedAlly = null ## The ally combatant that the player is currently in control of
-var actionState = "actionSelect" ## The state value for the battle's state machine
-var selectedEnemy = null ## The enemy which the player is targeting
+var selectedAlly : Ally = null ## The ally combatant that the player is currently in control of
+var actionState : String = "actionSelect" ## The state value for the battle's state machine
+var selectedEnemy : Enemy = null ## The enemy which the player is targeting
 var playerAction : bool = false ## True if it is the player's (ally's) turn, false if enemy's turn
 var enemyAction : bool = false ## True if it is the enemy's (enemy's) turn
-var comboIndex = 0 ## The stage of the current combo in execution
+var comboIndex : int = 0 ## The stage of the current combo in execution
 var selectedCombo : Combo ## The combo chain selected to be executed for the turn
-var selectedMove : CombatMove  ## The move selected to be executed for the turn
+var currentMove : CombatMove ## The current move based on the comboIndex
 var speedMap : Array[TurnOrder] = [] ## The list for tracking the current order of combatant turns
 var returnPosition : Vector2 = Vector2(0, 0) ## The position which an ally or enemy returns after executing their turn
 var actionType : String
+var tweens : Array[Tween] ## A type of animation
+var tweenCounter : int ## Track how many tweens have finished
 
-signal resetBattleCamera()
-signal resetSelectionUI()
+signal resetBattleCamera() ## Emits to battleCamera -> doCameraReset
+signal resetSelectionUI() ## Emits to selectionUI -> resetUI
+signal actionGaugeAdvance() ## Emits to characterStats -> actionGaugeAdvance
+signal turnEndActionGauge() ## Emits to characterStats -> turnEndActionGauge
+signal queueInputsForReaction() ## Emits to reactionPath -> addFollowers
+signal targetUpdated(targets : Array) ## Emits to battleField -> targetUpdated
 
-signal actionGaugeAdvance()
-signal turnEndActionGauge()
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
 func _customSpeedSort(a : TurnOrder, b : TurnOrder):
 		return (a.speed > b.speed)
@@ -44,7 +50,6 @@ func characterTurn(actingCharacter: CharacterStats):
 		selectedEnemy = actingCharacter
 		enemyAction = true
 	
-	print(actingCharacter.name)
 
 ## *Signal Function*
 ## Emits when overlappingCollisionArea "body_entered" signal is triggered in ally.gd (built-in node signal)
@@ -73,8 +78,11 @@ func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
 		selectedCombo = choice
 	elif choice is CombatMove:
 		actionType = "move"
-		selectedMove = choice
+		selectedCombo = Combo.new("move", [choice])
 	
+	## TODO: Temporary, change to dynamic selector based on history (last turn)
+	selectedEnemy = enemies[0]
+	selectedEnemy.find_child('Sprite2D').material = selectShader
 	actionState = "targetSelect"
 	
 ## Processes enemy turn. Takes target and move selection from enemy signal
@@ -82,6 +90,29 @@ func processEnemyTurn(enemy, target, move:CombatMove):
 	print(enemy.name, " attacks ", target.name)
 	_process_damage(target, move.damage)
 	
+
+
+## *Signal Function*
+## Emit recieved from reactionPath.gd
+func beginCombatExecutionState(timeSummation: float) -> void:
+	actionState = "combatExecution"
+	
+## *Signal Function*
+## Emit recieved from Tween.finished
+func tweenEnds() -> void:
+	tweenCounter += 1
+	
+## *Signal Function*
+## Emit recieved from reactionPath.gd
+func endCombatExecutionState() -> void:
+	actionState = "combatReset"
+	
+
+## Processes enemy turn. Takes target and move selection from enemy signal
+func processEnemyTurn(enemy, target, move:CombatMove):
+	print(enemy.name, " attacks ", target.name)
+	_process_damage(target, move.damage)
+
 
 ## Gets a list of the combatants in the battle field and determines the next one to take turn
 ## @return - A reference to the node of the next combatant to take turn
@@ -95,37 +126,147 @@ func getNextCombatant():
 	]
 	return nextCombatant
 	
+## Handles movement tweening
+func handleMovementTween(primary : CharacterStats, secondary : CharacterStats, tweenProperties : Array[TweenProperty], easeType : Tween.EaseType) -> void:
+	if tweenProperties.is_empty():
+		return
+		
+	var tween = get_tree().create_tween()
+	tween.pause()
+	tween.set_ease(easeType)
+	for tProp in tweenProperties:
+		
+		var movementCall : Callable = tProp.calcDict[tProp.calcKey].bindv(tProp.calcArguments)
+		var finalValue
+		if movementCall.get_argument_count() == 2:
+			finalValue = movementCall.call(primary, secondary)
+		else:
+			finalValue = movementCall.call(primary)
+		tween.tween_property(
+			primary, 
+			tProp.property, 
+			finalValue, 
+			tProp.duration).set_trans(tProp.transition)
+			
+	tween.finished.connect(tweenEnds)		
+	tweens.append(tween)
+	
 ## Handles the user input during a quick-time combo string 
 ## @param attackVariant - The type of attack executed by the player determined by their input
 ## @param skillPointsUsed - The number of skill poitns to remove from the combatant
 func processComboInput(attackVariant: String, skillPointsUsed: int):
 	
-	var overlaps = reactionClickArea.get_overlapping_areas()
+	var queue = reactionClickArea.get_overlapping_areas()	
 		
-	if len(overlaps) > 0:
+	if len(queue) > 0:
 		
-		if (attackVariant == overlaps[0].get_parent().attackVariant):
-			var currMove : CombatMove = selectedCombo.comboList[comboIndex]
+		#temp - get next move's distance boundary
+		var nextMoveDistance : int
+		if comboIndex + 1 < selectedCombo.comboList.size():
+			nextMoveDistance = selectedCombo.comboList[comboIndex + 1].minimumDistanceToTargets
+		
+		if (attackVariant == queue[0].get_parent().attackVariant):
+			var move : CombatMove = currentMove
+			## NOTE: Temporary assignments, will need to be dynamically assigned
+			var attacker = selectedAlly
+			var reciever = selectedEnemy
+			# Reduce skills points from gauge
 			selectedAlly.skill_points -= skillPointsUsed
+
+			handleMovementTween(attacker, reciever, move.attackerAnimationProperties, move.attackerAnimationEase)
+			handleMovementTween(reciever, attacker, move.recieverAnimationProperties, move.recieverAnimationEase)
 			
-			var vel = Vector2(selectedEnemy.global_position - selectedAlly.global_position)
-			var normalizedVelocity = vel / vel.length()
+			# Run tweens
+			for tween in tweens:
+				tween.play()
 			
-			selectedAlly.velocity = normalizedVelocity * currMove.playerSpeed
-			selectedAlly.acceleration = 0.99
-			# Disable collision mask that matches the collision layer of the enemy target
-			selectedAlly.collision_mask = 0b00
 			selectedAlly.isAttacking = true
 			# Connect to the selected ally's signal for overlapping collision detection
-			selectedAlly.overlappingCollisionArea.body_entered.connect(_process_damage.bind(currMove.damage))
+			selectedAlly.overlappingCollisionArea.body_entered.connect(_process_damage.bind(move.damage))
+			# Move to next move in list
 			comboIndex += 1
+			if comboIndex < selectedCombo.comboList.size():
+				currentMove = selectedCombo.comboList[comboIndex]
 		else:
 			print("wrong!")
+			
+func ActionSelectState():
+	##Pass and wait for signal
+	pass
+	
+func processTargetSelectChange(inputMapping: String):
+	var enemyIndex = selectedEnemy.get_index()
+	var nextIndex: int
+	if inputMapping == "move_down":
+		nextIndex = enemyIndex + 1 if enemyIndex + 1 != enemies.size() else 0
+	else:
+		nextIndex = enemyIndex - 1 if enemyIndex != 0 else enemies.size() - 1
+	
+	selectedEnemy.find_child('Sprite2D').material = null
+	selectedEnemy = enemies[nextIndex]
+	selectedEnemy.find_child('Sprite2D').material = selectShader
+
+	
+func TargetSelectState():
+	
+	if Input.is_action_just_pressed("move_down"):
+		processTargetSelectChange("move_down")
+
+	elif Input.is_action_just_pressed("move_up"):
+		processTargetSelectChange("move_up")
+	
+	if Input.is_action_just_pressed("interact"):
+		# Initialize a bunch of stuff for future states
+		var vel = Vector2(selectedEnemy.global_position - selectedAlly.global_position)
+		var normalizedVelocity = vel / vel.length()
+		returnPosition = selectedAlly.global_position
+		selectedAlly.velocity = normalizedVelocity * 120
+		selectedAlly.find_child('Sprite2D').material = null
+		selectedEnemy.find_child('Sprite2D').material = null
+		targetUpdated.emit([selectedAlly, selectedEnemy])
+		comboIndex = 0
+		currentMove = selectedCombo.comboList[comboIndex]
+		actionState = "combatStart"
+		
+func CombatStartState():
+	## TODO: 100 is completely arbitrary at the moment
+	if Vector2(
+		selectedEnemy.global_position - selectedAlly.global_position
+		).length() <= currentMove.minimumDistanceToTargets:
+		selectedAlly.velocity = Vector2(0, 0)
+		# Add inputs to reaction bar
+		#var timeSummation: float = 0
+		queueInputsForReaction.emit(selectedCombo.comboList)
+		
+func CombatExecutionState():
+	
+	if Input.is_action_just_pressed("slash"):
+		processComboInput("slash", 2)
+		
+	elif Input.is_action_just_pressed("strike"):
+		processComboInput("strike", 4)
+
+	elif Input.is_action_just_pressed("pierce"):
+		processComboInput("pierce", 3)
+		
+func CombatResetState():
+	if tweenCounter == tweens.size():
+		for tw in tweens:
+			tw.kill()
+		selectedAlly.global_position = returnPosition
+		selectedAlly.velocity = Vector2(0, 0)
+		selectedAlly.turnEndActionGauge()
+		selectedCombo = null
+		resetBattleCamera.emit()
+		resetSelectionUI.emit()
+		actionState = "actionSelect"
 
 
 func _ready():
 	
 	resetBattleCamera.connect(camera.doCameraReset)
+	queueInputsForReaction.connect(reactionPath.addFollowers)
+	targetUpdated.connect(cameraFocus.updateTargetPoints)
 	
 	# populate allies and enemies groups here, temporarily static
 	var cameraHeight : float = 108 * 2
@@ -185,79 +326,12 @@ func _process(delta):
 	
 	if playerAction:
 
-		if actionState == "actionSelect":
-			## TODO: Temporary, change to dynamic selector based on history (last turn)
-			selectedEnemy = enemies[0]
-					
-		if actionState == "targetSelect":
-			
-			var enemyIndex = selectedEnemy.get_index()
-			var nextIndex = enemyIndex
-			
-			if Input.is_action_just_pressed("move_down"):
-				nextIndex = enemyIndex + 1 if enemyIndex + 1 != enemies.size() else 0
-			elif Input.is_action_just_pressed("move_up"):
-				nextIndex = enemyIndex - 1 if enemyIndex != 0 else enemies.size() - 1
-
-			selectedEnemy.find_child('Sprite2D').material = null
-			selectedEnemy = enemies[nextIndex]
-			selectedEnemy.find_child('Sprite2D').material = selectShader
-			
-			if Input.is_action_just_pressed("interact"):
-				actionState = "combatStart"
-			
-		if actionState == "combatStart":
-			
-			var vel = Vector2(selectedEnemy.global_position - selectedAlly.global_position)
-			var normalizedVelocity = vel / vel.length()
-			returnPosition = selectedAlly.global_position
-			selectedAlly.velocity = normalizedVelocity * 120
-			selectedAlly.find_child('RayCast2D').target_position = vel
-			actionState = "combatMovement"
-			
-		if actionState == "combatMovement":
-			var vel = Vector2(selectedEnemy.global_position - selectedAlly.global_position)
-			if vel.length() <= 100:
-				selectedAlly.velocity = Vector2(0, 0)
-				comboIndex = 0
-				actionState = "combatExecution"
-				# Add inputs to reaction bar
-				var timeSummation: float = 0
-				if selectedCombo:
-					for move in selectedCombo.comboList:
-						timeSummation += move.reactionTime
-						var follower = ReactionPathFollower.new(move.attackVariant, timeSummation)
-						reactionPath.add_child(follower)
-				if selectedMove:
-					timeSummation += selectedMove.reactionTime
-					reactionPath.add_child(ReactionPathFollower.new(selectedMove.attackVariant, timeSummation))
-				
-		
-		if actionState == "combatExecution":
-			
-			## TODO: Can probably be optimized as a signal
-			if len(reactionPath.get_children()) == 2:
-				actionState = "combatReset"
-					
-			if Input.is_action_just_pressed("slash"):
-				processComboInput("slash", 2)
-				
-			elif Input.is_action_just_pressed("strike"):
-				processComboInput("strike", 4)
-
-			elif Input.is_action_just_pressed("pierce"):
-				processComboInput("pierce", 3)
-				
-		if actionState == "combatReset":
-			selectedAlly.global_position = returnPosition
-			selectedAlly.velocity = Vector2(0, 0)
-			selectedAlly.turnEndActionGauge()
-			selectedCombo = null
-			selectedMove = null
-			resetBattleCamera.emit()
-			resetSelectionUI.emit()
-			actionState = "actionSelect"
-			
+		match actionState:
+			"actionSelect": ActionSelectState()
+			"targetSelect": TargetSelectState()
+			"combatStart": CombatStartState()
+			"combatExecution": CombatExecutionState()
+			"combatReset": CombatResetState()
 				
 	elif enemyAction and !playerAction:
 		# Enemy turn

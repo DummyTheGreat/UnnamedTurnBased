@@ -12,20 +12,36 @@ class_name CombatMove
 @export var playerSpeed: int ## The speed at which the combatant's sprite moves when executing the move
 @export var targetVelocity: Vector2 ## The velocity at which the opposing combatant is launched at (knockback)
 @export var reactionTime: float ## The duration of time the move takes to travel along ReactionPath
+@export var minimumDistanceToTargets: int ## How close the the user of the move has to their targets to execute the move
+## movement animation
+@export var attackerAnimationEase: Tween.EaseType
+@export var attackerAnimationProperties : Array[TweenProperty]
+@export var recieverAnimationEase : Tween.EaseType
+@export var recieverAnimationProperties : Array[TweenProperty]
 
 func _init(
-	nameParam = "",
-	weaponParam =0, 
-	damageParam = 1,
-	attackVariantParam = "slash", 
-	playerSpeedParam = 1, 
-	targetVelocityParam = Vector2(0, 0),
-	reactionTimeParam = 1.0,
+	name : String = "",
+	weapon : int = 0, 
+	damage : int = 1,
+	attackVariant : String = "slash", 
+	playerSpeed : int = 1, 
+	targetVelocity : Vector2 = Vector2(0, 0),
+	reactionTime : float = 1.0,
+	minimumDistanceToTargets : int = 100,
+	attackerAnimationEase : Tween.EaseType = Tween.EASE_IN_OUT,
+	attackAnimationProperties : Array[TweenProperty] = [],
+	recieverAnimationEase : Tween.EaseType = Tween.EASE_IN_OUT,
+	recieverAnimationProperties : Array[TweenProperty] = []
 	):
-	name = nameParam
-	weapon = weaponParam
-	damage = damageParam
-	attackVariant = attackVariantParam
-	playerSpeed = playerSpeedParam
-	targetVelocity = targetVelocityParam
-	reactionTime = reactionTimeParam
+	self.name = name
+	self.weapon = weapon
+	self.damage = damage
+	self.attackVariant = attackVariant
+	self.playerSpeed = playerSpeed
+	self.targetVelocity = targetVelocity
+	self.reactionTime = reactionTime
+	self.minimumDistanceToTargets = minimumDistanceToTargets
+	self.attackerAnimationEase = attackerAnimationEase
+	self.attackerAnimationProperties = attackerAnimationProperties
+	self.recieverAnimationEase = recieverAnimationEase
+	self.recieverAnimationProperties = recieverAnimationProperties

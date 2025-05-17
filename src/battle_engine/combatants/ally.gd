@@ -4,9 +4,8 @@ extends CharacterStats
 ## An Ally as any combatant that the player is able to take control of during battle
 
 ## References
-@onready var directionRay = $RayCast2D
-@onready var cameraFocus : CameraFocus = $"../../../BattleCamera/CenterFocus"
 @onready var collisionShape = $CollisionShape2D
+#@onready var animationPlayer : AnimationPlayer = $AnimationPlayer
 
 var movementSpd = 0 ##spd
 var isAttacking = false ## True if this ally is currently engaging in a combo or attack
@@ -18,9 +17,6 @@ var collisionTarget = null ## Target being collided with in combat
 var overlappingCollisionArea : Area2D = null ## 
 
 var healthBar = null
-## Emits on collision with another combatant
-## Emission recieved by (battleField.gd)
-signal target_updated()
 
 func _ready():
 
@@ -53,14 +49,17 @@ func _ready():
 	self.add_child(overlappingCollisionArea)
 	overlappingCollisionArea.add_child(areaCollision)
 	
+	var move1 : CombatMove = load("res://src/battle_engine/resources/moves/sword_slash.tres")
+	#var property1 : TweenProperty = load("res://src/battle_engine/resources/tweenProperties/swordSlashAttackerP1.tres")
+	#move1.attackerAnimationProperties.append(property1)
 	self.moves = [
+		move1,
 		load("res://src/battle_engine/resources/moves/sword_pierce.tres"),
-		load("res://src/battle_engine/resources/moves/sword_slash.tres")
 	]
 	
 	self.comboChains = [
 		load("res://src/battle_engine/resources/combos/swordSlashDouble.tres"),
-		load("res://src/battle_engine/resources/combos/sword_0_2.tres")
+		load("res://src/battle_engine/resources/combos/sliceAndSkewer.tres")
 	]
 			
 
@@ -70,19 +69,6 @@ func _action():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	# temporary until all allies have ray
-	var collider = directionRay.get_collider() if directionRay != null else null
-		
-	if (collider != null and collider != collisionTarget):
-		
-		# Prevent endless loop into condition ^
-		collisionTarget = collider
-		
-		# Find midpoint, create temporary node at midpoint for camera to focus on
-		cameraFocus.first = self
-		cameraFocus.second = collider
-		
-		target_updated.emit()
 		
 	movementSpd = velocity.length()
 
