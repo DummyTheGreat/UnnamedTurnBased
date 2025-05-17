@@ -108,11 +108,6 @@ func endCombatExecutionState() -> void:
 	actionState = "combatReset"
 	
 
-## Processes enemy turn. Takes target and move selection from enemy signal
-func processEnemyTurn(enemy, target, move:CombatMove):
-	print(enemy.name, " attacks ", target.name)
-	_process_damage(target, move.damage)
-
 
 ## Gets a list of the combatants in the battle field and determines the next one to take turn
 ## @return - A reference to the node of the next combatant to take turn
