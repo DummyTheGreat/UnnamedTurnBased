@@ -5,10 +5,13 @@ extends Marker2D
 ## the camera is then set to follow
 
 @onready var focusPoints : Array = [self.get_parent()] ## List of focus points
+
+var numPoints : float = 1
 ## *Signal Function*
 ## Emits from battle when enemy selections are made
 func updateTargetPoints(targetList : Array):
 	focusPoints = targetList
+	numPoints = float(targetList.size())
 	#temp
 	get_parent().activateZoom = true
 
@@ -19,7 +22,5 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var sum : Vector2 = Vector2(0, 0)
-	for point in focusPoints:
-		sum += point.global_position
-	self.global_position = sum * (1.0 / float(focusPoints.size()))
+	var sum = focusPoints.reduce(func(sum, point): return sum + point.position, Vector2(0, 0))
+	self.global_position = sum * (1.0 / numPoints)

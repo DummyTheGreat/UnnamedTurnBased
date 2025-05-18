@@ -18,6 +18,7 @@ extends CharacterBody2D
 var targetted : bool = false
 
 var combatID : int ## Unique identifier used in combat
+	
 
 func _init() -> void:
 	combatID = Globals.combatantID

@@ -15,12 +15,13 @@ extends Node2D
 
 ## Scenes
 @onready var selectionUI = preload("res://src/battle_engine/core/SelectionUI.tscn")
-
 var combatants : Array[Node] ## List of all combatants
 var actingCombatant : CharacterStats = null ## The ally combatant that the player is currently in control of
 var actionState : String = "actionSelect" ## The state value for the battle's state machine
 var selectedTargets : Array[CharacterStats] = [] ## A list of targets to execute the action on
-var targetSelectorIndex : int = 0
+var linkedAllies : CircularDoubleLinkedList
+var linkedEnemies : CircularDoubleLinkedList
+var selectedList : CircularDoubleLinkedList
 var selected : CharacterStats = null
 var playerAction : bool = false ## True if it is the player's (ally's) turn, false if enemy's turn
 var enemyAction : bool = false ## True if it is the enemy's (enemy's) turn
@@ -39,6 +40,7 @@ signal actionGaugeAdvance() ## Emits to characterStats -> actionGaugeAdvance
 signal turnEndActionGauge() ## Emits to characterStats -> turnEndActionGauge
 signal queueInputsForReaction() ## Emits to reactionPath -> addFollowers
 signal targetUpdated(targets : Array) ## Emits to battleField -> targetUpdated
+
 
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
 func _customSpeedSort(a : TurnOrder, b : TurnOrder):
@@ -195,20 +197,21 @@ func ActionSelectState():
 	
 func processTargetSelectChange(inputMapping: String):
 	
-	if inputMapping == "move_down":
-		while(true):
-			targetSelectorIndex = targetSelectorIndex + 1 if targetSelectorIndex + 1 != combatants.size() else 0
-			if not combatants[targetSelectorIndex].targetted:
-				break
-	else:
-		while(true):
-			targetSelectorIndex = targetSelectorIndex - 1 if targetSelectorIndex != 0 else combatants.size() - 1
-			if not combatants[targetSelectorIndex].targetted:
-				break
 	
-	print(targetSelectorIndex)
-	selected.find_child('Sprite2D').material = null
-	selected = combatants[targetSelectorIndex]
+	if inputMapping == "move_down":
+		selectedList.pointer = selectedList.pointer.next
+		while selectedList.pointer.data.targetted: # Skip characters already selected for targeting or acting
+			selectedList.pointer = selectedList.pointer.next
+	elif inputMapping == "move_up":
+		selectedList.pointer = selectedList.pointer.prev
+		while selectedList.pointer.data.targetted:
+			selectedList.pointer.pointer = selectedList.pointer.prev
+	else:
+		selectedList = linkedAllies if selectedList == linkedEnemies else linkedEnemies
+
+	if not selected.targetted:
+		selected.find_child('Sprite2D').material = null
+	selected = selectedList.pointer.data
 	selected.find_child('Sprite2D').material = selectShader
 
 	
@@ -219,6 +222,9 @@ func TargetSelectState():
 
 	elif Input.is_action_just_pressed("move_up"):
 		processTargetSelectChange("move_up")
+		
+	elif Input.is_action_just_pressed("move_left") or Input.is_action_just_pressed("move_right"):
+		processTargetSelectChange("move_horizontal")
 	
 	if Input.is_action_just_pressed("interact"):
 		
@@ -235,8 +241,7 @@ func TargetSelectState():
 			actingCombatant.find_child('Sprite2D').material = null
 			for target in selectedTargets:
 				target.find_child('Sprite2D').material = null
-			## TODO: this signal needs to be reworked to accept more than 2 targets
-			#targetUpdated.emit([selectedAlly, selectedEnemy])
+			targetUpdated.emit([actingCombatant] + selectedTargets)
 			actionState = "combatStart"
 		
 func CombatStartState():
@@ -268,6 +273,8 @@ func CombatResetState():
 		actingCombatant.global_position = returnPosition
 		actingCombatant.velocity = Vector2(0, 0)
 		actingCombatant.turnEndActionGauge()
+		for combatant : CharacterStats in combatants:
+			combatant.targetted = false
 		selectedCombo = null
 		resetBattleCamera.emit()
 		resetSelectionUI.emit()
@@ -296,6 +303,16 @@ func _ready():
 		
 	combatants = get_tree().get_nodes_in_group("Combatants")
 	
+	linkedAllies = CircularDoubleLinkedList.new()
+	for ally in allies:
+		linkedAllies.append(ally)
+	
+	linkedEnemies = CircularDoubleLinkedList.new()
+	for enemy in enemies:
+		linkedEnemies.append(enemy)
+		
+	selectedList = linkedEnemies
+		
 	for combatant in combatants:
 		actionGaugeAdvance.connect(combatant.actionAdvanceGauge)
 				
