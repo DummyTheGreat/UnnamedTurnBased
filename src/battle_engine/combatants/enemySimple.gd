@@ -44,6 +44,7 @@ func _action():
 		enemySignal.emit(self, target, move)
 	
 	if selectedmove == "combo":
+		## TODO Create combos for enemy (parry system)
 		print("Enemy uses combo!")
 		# var target = self._assess_targets(self.owner.allies)
 		# var combo = comboChains[randi() % comboChains.size()]
