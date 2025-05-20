@@ -8,8 +8,8 @@ extends Node2D
 @onready var cameraFocus = $BattleCamera/CenterFocus
 @onready var reactionPath = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath
 @onready var reactionClickArea = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath/ClickArea
-@onready var turnOrder = $UILayer/BattleUI/HorizontalContainer/MarginContainer/TurnOrderVisual
 @onready var battleUI = $UILayer/BattleUI
+@onready var turnOrder = $UILayer/BattleUI/HorizontalContainer
 
 ## Load shaders
 @onready var selectShader = preload("res://assets/shaders/allySelectedShader.tres")
@@ -17,6 +17,7 @@ extends Node2D
 ## Scenes
 @onready var selectionUI = preload("res://src/battle_engine/core/SelectionUI.tscn")
 @onready var characterStatusUI = preload("res://src/battle_engine/UI/CharacterStatusUI.tscn")
+@onready var turnOrderUI = preload("res://src/battle_engine/core/turn-order.tscn")
 
 var combatants : Array[Node] ## List of all combatants
 var actingCombatant : CharacterStats = null ## The ally combatant that the player is currently in control of
@@ -31,11 +32,11 @@ var enemyAction : bool = false ## True if it is the enemy's (enemy's) turn
 var comboIndex : int = 0 ## The stage of the current combo in execution
 var selectedCombo : Combo ## The combo chain selected to be executed for the turn
 var currentMove : CombatMove ## The current move based on the comboIndex
-var speedMap : Array[TurnOrder] = [] ## The list for tracking the current order of combatant turns
 var returnPosition : Vector2 = Vector2(0, 0) ## The position which an ally or enemy returns after executing their turn
 var actionType : String
 var tweens : Array[Tween] ## A type of animation
 var tweenCounter : int ## Track how many tweens have finished
+var turnOrderNode: TurnOrderUI = null
 
 signal resetBattleCamera() ## Emits to battleCamera -> doCameraReset
 signal resetSelectionUI() ## Emits to selectionUI -> resetUI
@@ -43,6 +44,7 @@ signal actionGaugeAdvance() ## Emits to characterStats -> actionGaugeAdvance
 signal turnEndActionGauge() ## Emits to characterStats -> turnEndActionGauge
 signal queueInputsForReaction() ## Emits to reactionPath -> addFollowers
 signal targetUpdated(targets : Array) ## Emits to battleField -> targetUpdated
+signal updateStatusUI(combatant : CharacterStats)
 
 
 
@@ -50,14 +52,23 @@ signal targetUpdated(targets : Array) ## Emits to battleField -> targetUpdated
 func _customSpeedSort(a : TurnOrder, b : TurnOrder):
 		return (a.speed > b.speed)
 
-func characterTurn(actingCharacter: CharacterStats):
-	if actingCharacter is Ally:
-		actingCombatant = actingCharacter
+func characterTurn(nextCombatant: CharacterStats):
+	if actingCombatant != null:
+		return
+		
+	if nextCombatant is Ally:
+		actingCombatant = nextCombatant
 		playerAction = true
-		selectedCombo = actingCharacter.comboChains[0]
-	if actingCharacter is Enemy:
-		actingCombatant = actingCharacter
+		selectedCombo = actingCombatant.comboChains[0]
+		var uiInstance = selectionUI.instantiate()
+		resetSelectionUI.connect(uiInstance.resetUI)
+		actingCombatant.add_child(uiInstance)
+		actingCombatant.find_child('Sprite2D').material = selectShader
+	if nextCombatant is Enemy:
+		actingCombatant = nextCombatant
 		enemyAction = true
+		
+	updateStatusUI.emit(actingCombatant)
 	
 
 ## *Signal Function*
@@ -120,17 +131,7 @@ func endCombatExecutionState() -> void:
 	
 
 
-## Gets a list of the combatants in the battle field and determines the next one to take turn
-## @return - A reference to the node of the next combatant to take turn
-func getNextCombatant():
-	
-	var combatants = get_tree().get_nodes_in_group("Combatants")
-	var nextCombatant = combatants[
-		combatants.find_custom(
-			func(combatant): return combatant.combatID == speedMap[0].id
-		)
-	]
-	return nextCombatant
+
 	
 ## Handles movement tweening
 func handleMovementTween(primary : CharacterStats, secondary : CharacterStats, tweenProperties : Array[TweenProperty], easeType : Tween.EaseType) -> void:
@@ -283,14 +284,28 @@ func CombatResetState():
 		selectedCombo = null
 		resetBattleCamera.emit()
 		resetSelectionUI.emit()
+		playerAction = false
+		enemyAction = false
+		actingCombatant = null
 		actionState = "actionSelect"
 
 
 func _ready():
+	combatants = get_tree().get_nodes_in_group("Combatants")
 	
+	var statUI : CharacterStatusUI = characterStatusUI.instantiate()
+	battleUI.add_child(statUI)
+	
+	updateStatusUI.connect(statUI.updateCharacter)
 	resetBattleCamera.connect(camera.doCameraReset)
 	queueInputsForReaction.connect(reactionPath.addFollowers)
 	targetUpdated.connect(cameraFocus.updateTargetPoints)
+	turnOrderNode = turnOrderUI.instantiate()
+	turnOrder.add_child(turnOrderNode)
+	turnOrderNode.inputList(combatants)
+	#get rid of later
+	turnOrder.move_child(turnOrderNode, 0)
+	
 	
 	# populate allies and enemies groups here, temporarily static
 	var cameraHeight : float = 108 * 2
@@ -305,8 +320,6 @@ func _ready():
 	for i in range(enemies.size()):
 		var pos = Vector2(100, spacing / 2 - spacing * i)
 		enemies[i].global_position = pos
-		
-	combatants = get_tree().get_nodes_in_group("Combatants")
 	
 	linkedAllies = CircularDoubleLinkedList.new()
 	for ally in allies:
@@ -317,53 +330,15 @@ func _ready():
 		linkedEnemies.append(enemy)
 		
 	selectedList = linkedEnemies
-	
-	var statUI : CharacterStatusUI = characterStatusUI.instantiate()
-	battleUI.add_child(statUI)
 		
 	for combatant : CharacterStats in combatants:
 		actionGaugeAdvance.connect(combatant.actionAdvanceGauge)
-		combatant.characterTurn.connect(statUI.updateCharacter)
-				
-	# TODO: Chnage this to use the Combatants group
-	# Set initial turn order
-	for i in range(allies.size() + enemies.size()):
-		if i < allies.size():
-			speedMap.append(TurnOrder.new(allies[i].speed, allies[i].combatID))
-		else:
-			i -= allies.size()
-			speedMap.append(TurnOrder.new(enemies[i].speed, enemies[i].combatID))
-		
-	speedMap.sort_custom(_customSpeedSort)
-	
-	# Populate turn order UI
-	for entry in speedMap:
-		var labelChild = Label.new()
-		var combatant = combatants[combatants.find_custom(
-			func(combatant): return combatant.combatID == entry.id
-			)]
-		labelChild.text = str(combatant.characterName) + str(combatant.actionValue)
-		
-		turnOrder.add_child(labelChild)
-		
-	var nextCombatant = getNextCombatant()
-	if nextCombatant is Ally:
-		playerAction = true
-		actingCombatant = nextCombatant
-		
-		var uiInstance = selectionUI.instantiate()
-		resetSelectionUI.connect(uiInstance.resetUI)
-		actingCombatant.add_child(uiInstance)
-		actingCombatant.find_child('Sprite2D').material = selectShader
-	else:
-		playerAction = false
-		actingCombatant = nextCombatant
 					
 			
 func _process(delta):
 	
 	if playerAction:
-
+		turnOrderNode.updateList()
 		match actionState:
 			"actionSelect": ActionSelectState()
 			"targetSelect": TargetSelectState()
@@ -371,14 +346,13 @@ func _process(delta):
 			"combatExecution": CombatExecutionState()
 			"combatReset": CombatResetState()
 				
-	elif enemyAction and !playerAction:
+	elif enemyAction:
+		print("hi")
 		# Enemy turn
-		if Input.is_action_just_pressed("move_left"):
-			enemyAction = false
-			# print(selectedEnemy.name + " moved")
-			# Enemy does its action
-			actingCombatant._action()
-			actingCombatant.turnEndActionGauge()
-			pass
+		enemyAction = false
+		# Enemy does its action
+		actingCombatant._action()
+		actingCombatant.turnEndActionGauge()
+		CombatResetState()
 	else:
 		actionGaugeAdvance.emit()

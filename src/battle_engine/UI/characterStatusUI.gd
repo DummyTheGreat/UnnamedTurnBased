@@ -12,7 +12,6 @@ func updateCharacter(combatant: CharacterStats):
 	## TODO: Change when actual values are implemented
 	comboBar.max_value = 10
 	comboBar.value = 10
-	
 	skillBar.max_value = 10
 	skillBar.value = 10
 	

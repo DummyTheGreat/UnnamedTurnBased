@@ -128,6 +128,7 @@ func resetUI():
 	for child in selectionList.get_children():
 		selectionList.remove_child(child)
 		child.queue_free()
+	self.queue_free()
 	
 	
 	
