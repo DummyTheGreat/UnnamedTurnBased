@@ -28,7 +28,7 @@ func _ready():
 func _action():
 	var target = self._assess_targets(self.owner.allies)
 	# Randomly selects a move for now
-	var move = moves[randi() % moves.size()]
+	var move = self.comboChains[randi() % comboChains.size()]
 	enemySignal.emit(self, target, move)
 	
 	

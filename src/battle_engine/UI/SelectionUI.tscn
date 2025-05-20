@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cgo0pr8cncurr"]
 
-[ext_resource type="Script" uid="uid://dnqdqx5sygs01" path="res://src/battle_engine/core/selectionUI.gd" id="1_4x5ev"]
+[ext_resource type="Script" uid="uid://dnqdqx5sygs01" path="res://src/battle_engine/UI/selectionUI.gd" id="1_4x5ev"]
 
 [node name="SelectionUI" type="Control"]
 layout_mode = 3

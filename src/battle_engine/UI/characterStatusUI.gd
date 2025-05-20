@@ -25,4 +25,8 @@ func updateCharacter(combatant: Combatant):
 		imageSlot.texture = sprt.texture
 	else:
 		self.visible = false
-	
+
+## *Signal Function*
+## Emits from battle after target selection phase
+func toggleVisibility():
+	self.visible = !self.visible

@@ -15,9 +15,9 @@ extends Node2D
 @onready var selectShader = preload("res://assets/shaders/allySelectedShader.tres")
 
 ## Scenes
-@onready var selectionUI = preload("res://src/battle_engine/core/SelectionUI.tscn")
+@onready var selectionUI = preload("res://src/battle_engine/UI/SelectionUI.tscn")
 @onready var characterStatusUI = preload("res://src/battle_engine/UI/CharacterStatusUI.tscn")
-@onready var turnOrderUI = preload("res://src/battle_engine/core/turn-order.tscn")
+@onready var turnOrderUI = preload("res://src/battle_engine/UI/turn-order.tscn")
 
 var combatants : Array[Node] ## List of all combatants
 var actingCombatant : Combatant = null ## The ally combatant that the player is currently in control of
@@ -44,8 +44,8 @@ signal actionGaugeAdvance() ## Emits to Combatant -> actionGaugeAdvance
 signal turnEndActionGauge() ## Emits to Combatant -> turnEndActionGauge
 signal queueInputsForReaction() ## Emits to reactionPath -> addFollowers
 signal targetUpdated(targets : Array) ## Emits to battleField -> targetUpdated
-signal updateStatusUI(combatant : Combatant)
-
+signal updateStatusUI(combatant : Combatant) ## Emits to characterStatusUI -> updateCharacter
+signal toggleStatusUIVisibility() ## Emits to characterStatusUI -> toggleVisibility
 
 
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
@@ -108,9 +108,9 @@ func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
 	actionState = "targetSelect"
 	
 ## Processes enemy turn. Takes target and move selection from enemy signal
-func processEnemyTurn(enemy, target, move:CombatMove):
+func processEnemyTurn(enemy, target, move:Combo):
 	print(enemy.name, " attacks ", target.name)
-	_process_damage(target, move.damage)
+	_process_damage(target, move.comboList[0].damage)
 	
 
 
@@ -129,9 +129,6 @@ func tweenEnds() -> void:
 func endCombatExecutionState() -> void:
 	actionState = "combatReset"
 	
-
-
-
 	
 ## Handles movement tweening
 func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProperties : Array[TweenProperty], easeType : Tween.EaseType) -> void:
@@ -248,6 +245,7 @@ func TargetSelectState():
 			for target in selectedTargets:
 				target.find_child('Sprite2D').material = null
 			targetUpdated.emit([actingCombatant] + selectedTargets)
+			toggleStatusUIVisibility.emit()
 			actionState = "combatStart"
 		
 func CombatStartState():
@@ -297,6 +295,7 @@ func _ready():
 	battleUI.add_child(statUI)
 	
 	updateStatusUI.connect(statUI.updateCharacter)
+	toggleStatusUIVisibility.connect(statUI.toggleVisibility)
 	resetBattleCamera.connect(camera.doCameraReset)
 	queueInputsForReaction.connect(reactionPath.addFollowers)
 	targetUpdated.connect(cameraFocus.updateTargetPoints)
