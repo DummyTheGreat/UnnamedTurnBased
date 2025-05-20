@@ -3,11 +3,11 @@ class_name CircularDoubleLinkedList
 ## Internal Class for holding Linked List data
 class ListNode:
 	
-	var data : CharacterStats
+	var data : Combatant
 	var next : ListNode
 	var prev : ListNode
 	
-	func _init(data : CharacterStats, next: ListNode = null, prev : ListNode = null) -> void:
+	func _init(data : Combatant, next: ListNode = null, prev : ListNode = null) -> void:
 		self.data = data
 		self.next = next
 		self.prev = prev
@@ -22,7 +22,7 @@ func _init() -> void:
 	self.size = 0
 
 # Attach to end of the circular list
-func append(data : CharacterStats) -> void:
+func append(data : Combatant) -> void:
 	if head == null:
 		head = ListNode.new(data)
 		head.next = head
@@ -36,7 +36,7 @@ func append(data : CharacterStats) -> void:
 		tail = newNode
 	size += 1
 		
-func setPointer(data : CharacterStats) -> ListNode:
+func setPointer(data : Combatant) -> ListNode:
 	if head.data == data:
 		return head
 	
@@ -49,7 +49,7 @@ func setPointer(data : CharacterStats) -> ListNode:
 	return null
 		
 		
-func insertAfterPointer(data : CharacterStats) -> bool:
+func insertAfterPointer(data : Combatant) -> bool:
 	if pointer == null:
 		return false
 		
@@ -66,7 +66,7 @@ func insertAfterPointer(data : CharacterStats) -> bool:
 	return true
 	
 	
-func remove(data : CharacterStats) -> bool:
+func remove(data : Combatant) -> bool:
 	if size == 1:
 		head = null
 		tail = null

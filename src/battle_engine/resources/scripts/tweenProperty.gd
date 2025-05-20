@@ -27,13 +27,13 @@ func _init(
 	
 
 ## Finds a position relative the the line formed by two vectors
-func EquationOfLine(attacker : CharacterStats, reciever : CharacterStats, scale : float) -> Vector2:
+func EquationOfLine(attacker : Combatant, reciever : Combatant, scale : float) -> Vector2:
 	return Vector2(
 		attacker.position.x + scale * (reciever.position.x - attacker.position.x),
 		attacker.position.y + scale * (reciever.position.y - attacker.position.y)
 	)
 	
 ## Knockback
-func ShiftRecieverByDistance(reciever : CharacterStats, distance : Vector2) -> Vector2:
+func ShiftRecieverByDistance(reciever : Combatant, distance : Vector2) -> Vector2:
 	return reciever.position + distance
 	

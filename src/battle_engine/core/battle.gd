@@ -20,13 +20,13 @@ extends Node2D
 @onready var turnOrderUI = preload("res://src/battle_engine/core/turn-order.tscn")
 
 var combatants : Array[Node] ## List of all combatants
-var actingCombatant : CharacterStats = null ## The ally combatant that the player is currently in control of
+var actingCombatant : Combatant = null ## The ally combatant that the player is currently in control of
 var actionState : String = "actionSelect" ## The state value for the battle's state machine
-var selectedTargets : Array[CharacterStats] = [] ## A list of targets to execute the action on
+var selectedTargets : Array[Combatant] = [] ## A list of targets to execute the action on
 var linkedAllies : CircularDoubleLinkedList
 var linkedEnemies : CircularDoubleLinkedList
 var selectedList : CircularDoubleLinkedList
-var selected : CharacterStats = null
+var selected : Combatant = null
 var playerAction : bool = false ## True if it is the player's (ally's) turn, false if enemy's turn
 var enemyAction : bool = false ## True if it is the enemy's (enemy's) turn
 var comboIndex : int = 0 ## The stage of the current combo in execution
@@ -40,11 +40,11 @@ var turnOrderNode: TurnOrderUI = null
 
 signal resetBattleCamera() ## Emits to battleCamera -> doCameraReset
 signal resetSelectionUI() ## Emits to selectionUI -> resetUI
-signal actionGaugeAdvance() ## Emits to characterStats -> actionGaugeAdvance
-signal turnEndActionGauge() ## Emits to characterStats -> turnEndActionGauge
+signal actionGaugeAdvance() ## Emits to Combatant -> actionGaugeAdvance
+signal turnEndActionGauge() ## Emits to Combatant -> turnEndActionGauge
 signal queueInputsForReaction() ## Emits to reactionPath -> addFollowers
 signal targetUpdated(targets : Array) ## Emits to battleField -> targetUpdated
-signal updateStatusUI(combatant : CharacterStats)
+signal updateStatusUI(combatant : Combatant)
 
 
 
@@ -52,7 +52,7 @@ signal updateStatusUI(combatant : CharacterStats)
 func _customSpeedSort(a : TurnOrder, b : TurnOrder):
 		return (a.speed > b.speed)
 
-func characterTurn(nextCombatant: CharacterStats):
+func characterTurn(nextCombatant: Combatant):
 	if actingCombatant != null:
 		return
 		
@@ -134,7 +134,7 @@ func endCombatExecutionState() -> void:
 
 	
 ## Handles movement tweening
-func handleMovementTween(primary : CharacterStats, secondary : CharacterStats, tweenProperties : Array[TweenProperty], easeType : Tween.EaseType) -> void:
+func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProperties : Array[TweenProperty], easeType : Tween.EaseType) -> void:
 	if tweenProperties.is_empty():
 		return
 		
@@ -279,7 +279,7 @@ func CombatResetState():
 		actingCombatant.global_position = returnPosition
 		actingCombatant.velocity = Vector2(0, 0)
 		actingCombatant.turnEndActionGauge()
-		for combatant : CharacterStats in combatants:
+		for combatant : Combatant in combatants:
 			combatant.targetted = false
 		selectedCombo = null
 		resetBattleCamera.emit()
@@ -331,7 +331,7 @@ func _ready():
 		
 	selectedList = linkedEnemies
 		
-	for combatant : CharacterStats in combatants:
+	for combatant : Combatant in combatants:
 		actionGaugeAdvance.connect(combatant.actionAdvanceGauge)
 					
 			

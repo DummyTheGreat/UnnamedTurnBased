@@ -8,7 +8,7 @@ class_name CharacterStatusUI
 
 ## *Signal Function*
 ## Emits from battle upon a new character turn
-func updateCharacter(combatant: CharacterStats):
+func updateCharacter(combatant: Combatant):
 	
 	if combatant is Ally:
 		self.visible = true

@@ -16,7 +16,7 @@ func inputList(characterList: Array) -> void:
 func orderList():
 	characters.sort_custom(character_array_sort)
 	
-func character_array_sort(a: CharacterStats, b: CharacterStats):
+func character_array_sort(a: Combatant, b: Combatant):
 	if a.actionValue < b.actionValue:
 		return true
 	elif a.actionValue == b.actionValue:

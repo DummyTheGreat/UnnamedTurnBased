@@ -1,5 +1,5 @@
 class_name Enemy
-extends CharacterStats
+extends Combatant
 
 @onready var battle = self.get_parent().get_parent().get_parent()
 
@@ -39,5 +39,4 @@ func _assess_targets(targets):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if self.current_health != healthBar.value:	
-		healthBar.value = self.current_health
+	pass

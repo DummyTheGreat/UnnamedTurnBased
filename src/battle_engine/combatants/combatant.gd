@@ -1,5 +1,5 @@
-class_name CharacterStats
 extends CharacterBody2D
+class_name Combatant
 
 ## Parent node of combatant types for defining their stats and identifiers
 
@@ -43,4 +43,4 @@ func actionAdvanceGauge() -> void:
 func turnEndActionGauge() -> void:
 	actionGauge += defaultActionGauge
 
-signal characterTurn(character : CharacterStats)
+signal characterTurn(character : Combatant)

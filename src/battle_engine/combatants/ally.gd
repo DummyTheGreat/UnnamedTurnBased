@@ -1,5 +1,5 @@
 class_name Ally
-extends CharacterStats
+extends Combatant
 
 ## An Ally as any combatant that the player is able to take control of during battle
 
@@ -67,7 +67,3 @@ func _process(delta):
 	for i in range(get_slide_collision_count() - 1):
 		var collision = get_slide_collision(i)
 		print(collision.get_collider())
-		
-	# Update health bar
-	if self.current_health != healthBar.value:	
-		healthBar.value = self.current_health
