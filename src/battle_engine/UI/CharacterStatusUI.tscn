@@ -1,27 +1,36 @@
-[gd_scene load_steps=2 format=3 uid="uid://cdsegpo3cs0nj"]
+[gd_scene load_steps=3 format=3 uid="uid://cdsegpo3cs0nj"]
 
 [ext_resource type="Script" uid="uid://cp6it7fqx2y06" path="res://src/battle_engine/UI/characterStatusUI.gd" id="1_agajj"]
+[ext_resource type="Theme" uid="uid://bjdr5j0ji3fqu" path="res://assets/themes/healthBarTheme.tres" id="2_y541c"]
 
 [node name="CharacterStatusUI" type="HBoxContainer"]
-anchors_preset = 15
-anchor_right = 1.0
+anchors_preset = 2
+anchor_top = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_top = -160.0
+offset_right = 328.0
+grow_vertical = 0
 script = ExtResource("1_agajj")
+
+[node name="SpriteImage" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
 
 [node name="Texts" type="VBoxContainer" parent="."]
 layout_mode = 2
 
 [node name="HealthText" type="Label" parent="Texts"]
+custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
 text = "HP"
 
 [node name="ComboText" type="Label" parent="Texts"]
+custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
 text = "CP"
 
 [node name="SkillText" type="Label" parent="Texts"]
+custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
 text = "SP"
 
@@ -29,19 +38,20 @@ text = "SP"
 layout_mode = 2
 
 [node name="HealthPoints" type="ProgressBar" parent="Bars"]
+custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
+theme = ExtResource("2_y541c")
 step = 1.0
 show_percentage = false
 
 [node name="ComboPoints" type="ProgressBar" parent="Bars"]
+custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
 step = 1.0
 show_percentage = false
 
 [node name="SkillPoints" type="ProgressBar" parent="Bars"]
+custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
 step = 1.0
 show_percentage = false
-
-[node name="SpriteImage" type="TextureRect" parent="."]
-layout_mode = 2

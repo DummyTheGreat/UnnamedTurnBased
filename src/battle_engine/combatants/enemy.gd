@@ -1,6 +1,7 @@
 class_name Enemy
 extends CharacterStats
 
+@onready var battle = self.get_parent().get_parent().get_parent()
 
 var healthBar = null
 # Signals to get move and target from enemy
@@ -8,22 +9,7 @@ signal enemySignal(enemy, target, move)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var battle = get_parent().get_parent().get_parent()
 	super._ready()
-	# Health Bar
-	healthBar = TextureProgressBar.new()
-	healthBar.name = "HealthBar"
-	
-	var health_bar_green = Image.new()
-	health_bar_green.load("res://assets/health_bar_green.png")
-	var t2 = ImageTexture.create_from_image(health_bar_green)
-
-	healthBar.texture_progress = t2
-	healthBar.max_value = self.max_health
-	healthBar.value = self.current_health
-	healthBar.scale = Vector2(0.2, 0.2)
-	healthBar.set_position(Vector2(-7, -14))
-	self.add_child(healthBar)
 	
 	# Enemy signal processing
 	enemySignal.connect(battle.processEnemyTurn)

@@ -22,21 +22,6 @@ func _ready():
 
 	super._ready()
 	
-	# Health Bar
-	healthBar = TextureProgressBar.new()
-	healthBar.name = "HealthBar"
-	
-	var health_bar_green = Image.new()
-	health_bar_green.load("res://assets/health_bar_green.png")
-	var t2 = ImageTexture.create_from_image(health_bar_green)
-
-	healthBar.texture_progress = t2
-	healthBar.max_value = self.max_health
-	healthBar.value = self.current_health
-	healthBar.scale = Vector2(0.2, 0.2)
-	healthBar.set_position(Vector2(-7, -14))
-	self.add_child(healthBar)
-	
 	# Create an area equivalent to the size of the collision box for overlapping detections
 	overlappingCollisionArea = Area2D.new()
 	var areaCollision = CollisionShape2D.new()

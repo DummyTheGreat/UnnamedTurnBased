@@ -6,16 +6,23 @@ class_name CharacterStatusUI
 @onready var skillBar : ProgressBar = $Bars/SkillPoints
 @onready var imageSlot : TextureRect = $SpriteImage
 
+## *Signal Function*
+## Emits from battle upon a new character turn
 func updateCharacter(combatant: CharacterStats):
-	healthBar.max_value = combatant.max_health
-	healthBar.value = combatant.current_health
-	## TODO: Change when actual values are implemented
-	comboBar.max_value = 10
-	comboBar.value = 10
-	skillBar.max_value = 10
-	skillBar.value = 10
 	
-	var sprt : Sprite2D = combatant.find_child("Sprite2D")
-	
-	imageSlot.texture = sprt.texture
+	if combatant is Ally:
+		self.visible = true
+		healthBar.max_value = combatant.max_health
+		healthBar.value = combatant.current_health
+		## TODO: Change when actual values are implemented
+		comboBar.max_value = 10
+		comboBar.value = 10
+		skillBar.max_value = 10
+		skillBar.value = 10
+		
+		var sprt : Sprite2D = combatant.find_child("Sprite2D")
+		
+		imageSlot.texture = sprt.texture
+	else:
+		self.visible = false
 	

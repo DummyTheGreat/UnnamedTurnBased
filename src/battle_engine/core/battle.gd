@@ -67,7 +67,7 @@ func characterTurn(nextCombatant: CharacterStats):
 	if nextCombatant is Enemy:
 		actingCombatant = nextCombatant
 		enemyAction = true
-		
+	
 	updateStatusUI.emit(actingCombatant)
 	
 
@@ -347,12 +347,10 @@ func _process(delta):
 			"combatReset": CombatResetState()
 				
 	elif enemyAction:
-		print("hi")
 		# Enemy turn
 		enemyAction = false
 		# Enemy does its action
 		actingCombatant._action()
-		actingCombatant.turnEndActionGauge()
 		CombatResetState()
 	else:
 		actionGaugeAdvance.emit()
