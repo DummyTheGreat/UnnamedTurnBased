@@ -91,6 +91,12 @@ func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
 	comboIndex = 0
 	currentMove = selectedCombo.comboList[comboIndex]
 	actionState = "targetSelect"
+	
+## Processes enemy turn. Takes target and move selection from enemy signal
+func processEnemyTurn(enemy, target, move:CombatMove):
+	print(enemy.name, " attacks ", target.name)
+	_process_damage(target, move.damage)
+	
 
 
 ## *Signal Function*
@@ -108,11 +114,6 @@ func tweenEnds() -> void:
 func endCombatExecutionState() -> void:
 	actionState = "combatReset"
 	
-
-## Processes enemy turn. Takes target and move selection from enemy signal
-func processEnemyTurn(enemy, target, move:CombatMove):
-	print(enemy.name, " attacks ", target.name)
-	_process_damage(target, move.damage)
 
 
 ## Gets a list of the combatants in the battle field and determines the next one to take turn
