@@ -43,4 +43,4 @@ func actionAdvanceGauge() -> void:
 func turnEndActionGauge() -> void:
 	actionGauge += defaultActionGauge
 
-signal characterTurn()
+signal characterTurn(character : CharacterStats)

@@ -9,12 +9,15 @@ extends Node2D
 @onready var reactionPath = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath
 @onready var reactionClickArea = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath/ClickArea
 @onready var turnOrder = $UILayer/BattleUI/HorizontalContainer/MarginContainer/TurnOrderVisual
+@onready var battleUI = $UILayer/BattleUI
 
 ## Load shaders
 @onready var selectShader = preload("res://assets/shaders/allySelectedShader.tres")
 
 ## Scenes
 @onready var selectionUI = preload("res://src/battle_engine/core/SelectionUI.tscn")
+@onready var characterStatusUI = preload("res://src/battle_engine/UI/CharacterStatusUI.tscn")
+
 var combatants : Array[Node] ## List of all combatants
 var actingCombatant : CharacterStats = null ## The ally combatant that the player is currently in control of
 var actionState : String = "actionSelect" ## The state value for the battle's state machine
@@ -40,6 +43,7 @@ signal actionGaugeAdvance() ## Emits to characterStats -> actionGaugeAdvance
 signal turnEndActionGauge() ## Emits to characterStats -> turnEndActionGauge
 signal queueInputsForReaction() ## Emits to reactionPath -> addFollowers
 signal targetUpdated(targets : Array) ## Emits to battleField -> targetUpdated
+
 
 
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
@@ -312,9 +316,13 @@ func _ready():
 		linkedEnemies.append(enemy)
 		
 	selectedList = linkedEnemies
+	
+	var statUI : CharacterStatusUI = characterStatusUI.instantiate()
+	battleUI.add_child(statUI)
 		
-	for combatant in combatants:
+	for combatant : CharacterStats in combatants:
 		actionGaugeAdvance.connect(combatant.actionAdvanceGauge)
+		combatant.characterTurn.connect(statUI.updateCharacter)
 				
 	# TODO: Chnage this to use the Combatants group
 	# Set initial turn order
