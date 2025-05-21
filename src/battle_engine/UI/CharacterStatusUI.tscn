@@ -12,7 +12,15 @@ offset_right = 328.0
 grow_vertical = 0
 script = ExtResource("1_agajj")
 
-[node name="SpriteImage" type="TextureRect" parent="."]
+[node name="SpriteBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="SpriteBox"]
+custom_minimum_size = Vector2(160, 20)
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="SpriteImage" type="TextureRect" parent="SpriteBox"]
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 
@@ -23,16 +31,19 @@ layout_mode = 2
 custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
 text = "HP"
+vertical_alignment = 1
 
 [node name="ComboText" type="Label" parent="Texts"]
 custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
 text = "CP"
+vertical_alignment = 1
 
 [node name="SkillText" type="Label" parent="Texts"]
 custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
 text = "SP"
+vertical_alignment = 1
 
 [node name="Bars" type="VBoxContainer" parent="."]
 layout_mode = 2

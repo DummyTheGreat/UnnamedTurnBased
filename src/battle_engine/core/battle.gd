@@ -45,7 +45,7 @@ signal turnEndActionGauge() ## Emits to Combatant -> turnEndActionGauge
 signal queueInputsForReaction() ## Emits to reactionPath -> addFollowers
 signal targetUpdated(targets : Array) ## Emits to battleField -> targetUpdated
 signal updateStatusUI(combatant : Combatant) ## Emits to characterStatusUI -> updateCharacter
-signal toggleStatusUIVisibility() ## Emits to characterStatusUI -> toggleVisibility
+signal toggleStatusUIVisibility(visibility : bool) ## Emits to characterStatusUI -> toggleVisibility
 
 
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
@@ -64,6 +64,8 @@ func characterTurn(nextCombatant: Combatant):
 		resetSelectionUI.connect(uiInstance.resetUI)
 		actingCombatant.add_child(uiInstance)
 		actingCombatant.find_child('Sprite2D').material = selectShader
+		toggleStatusUIVisibility.emit(true)
+		
 	if nextCombatant is Enemy:
 		actingCombatant = nextCombatant
 		enemyAction = true
@@ -245,7 +247,7 @@ func TargetSelectState():
 			for target in selectedTargets:
 				target.find_child('Sprite2D').material = null
 			targetUpdated.emit([actingCombatant] + selectedTargets)
-			toggleStatusUIVisibility.emit()
+			toggleStatusUIVisibility.emit(false)
 			actionState = "combatStart"
 		
 func CombatStartState():
