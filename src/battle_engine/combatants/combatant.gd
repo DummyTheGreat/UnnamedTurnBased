@@ -16,6 +16,7 @@ class_name Combatant
 @export var actionValue: int  ##Base Action Value
 
 var targetted : bool = false
+var baseBattlePosition : Vector2 = Vector2(0, 0)
 
 var combatID : int ## Unique identifier used in combat
 	

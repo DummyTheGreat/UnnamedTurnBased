@@ -65,10 +65,12 @@ func characterTurn(nextCombatant: Combatant):
 		actingCombatant.add_child(uiInstance)
 		actingCombatant.find_child('Sprite2D').material = selectShader
 		toggleStatusUIVisibility.emit(true)
+		actionState = "actionSelect"
 		
 	if nextCombatant is Enemy:
 		actingCombatant = nextCombatant
 		enemyAction = true
+		actionState = "AISelect"
 	
 	updateStatusUI.emit(actingCombatant)
 	
@@ -110,10 +112,14 @@ func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
 	actionState = "targetSelect"
 	
 ## Processes enemy turn. Takes target and move selection from enemy signal
-func processEnemyTurn(enemy, target, move:Combo):
-	print(enemy.name, " attacks ", target.name)
-	_process_damage(target, move.comboList[0].damage)
-	
+func processEnemyTurn(enemy : Enemy, targets : Array[Combatant], move : Combo):
+	print(enemy.name, " attacks ", targets[0].name)
+	selectedCombo = move
+	comboIndex = 0
+	currentMove = selectedCombo.comboList[comboIndex]
+	selectedTargets = targets
+	_process_damage(targets[0], move.comboList[0].damage)
+	prepareCombat()
 
 
 ## *Signal Function*
@@ -123,7 +129,7 @@ func beginCombatExecutionState(timeSummation: float) -> void:
 	
 ## *Signal Function*
 ## Emit recieved from Tween.finished
-func tweenEnds() -> void:
+func tweenEnds(index : int) -> void:
 	tweenCounter += 1
 	
 ## *Signal Function*
@@ -139,6 +145,7 @@ func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProper
 		
 	var tween = get_tree().create_tween()
 	tween.pause()
+	tween.set_parallel(true)
 	tween.set_ease(easeType)
 	for tProp in tweenProperties:
 		
@@ -148,13 +155,19 @@ func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProper
 			finalValue = movementCall.call(primary, secondary)
 		else:
 			finalValue = movementCall.call(primary)
-		tween.tween_property(
+		tween.chain().tween_property(
 			primary, 
 			tProp.property, 
 			finalValue, 
 			tProp.duration).set_trans(tProp.transition)
 			
-	tween.finished.connect(tweenEnds)		
+		if tProp.parallelCallable != null:
+			var tCall : TweenCallback = tProp.parallelCallable
+			var effectCall : Callable = tCall.callDict[tCall.callKey]
+			effectCall = effectCall.bindv([secondary] + tCall.callableArguments)
+			tween.tween_callback(effectCall).set_delay(tCall.delay)
+			
+	tween.finished.connect(tweenEnds.bind(tweens.size()))
 	tweens.append(tween)
 	
 ## Handles the user input during a quick-time combo string 
@@ -186,10 +199,6 @@ func processComboInput(attackVariant: String, skillPointsUsed: int):
 			for tween in tweens:
 				tween.play()
 			
-			actingCombatant.isAttacking = true
-			# Connect to the selected ally's signal for overlapping collision detection
-			actingCombatant.overlappingCollisionArea.body_entered.connect(_process_damage.bind(move.damage))
-			# Move to next move in list
 			comboIndex += 1
 			if comboIndex < selectedCombo.comboList.size():
 				currentMove = selectedCombo.comboList[comboIndex]
@@ -197,11 +206,11 @@ func processComboInput(attackVariant: String, skillPointsUsed: int):
 			print("wrong!")
 			
 func ActionSelectState():
-	##Pass and wait for signal
-	pass
+	## TODO: Change to signal. Only needs to happen once
+	if actingCombatant is Enemy:
+		actingCombatant._action()
 	
 func processTargetSelectChange(inputMapping: String):
-	
 	
 	if inputMapping == "move_down":
 		selectedList.pointer = selectedList.pointer.next
@@ -219,6 +228,18 @@ func processTargetSelectChange(inputMapping: String):
 	selected = selectedList.pointer.data
 	selected.find_child('Sprite2D').material = selectShader
 
+func prepareCombat():
+	var centroid = selectedTargets.reduce(func(accum, target): return accum + target.position, Vector2(0, 0)) / selectedTargets.size()
+	var vel = Vector2(centroid - actingCombatant.global_position)
+	var normalizedVelocity = vel / vel.length()
+	## TODO: Change arbitrary 120 to dynamically scale with the camera or some shit
+	actingCombatant.velocity = normalizedVelocity * 120
+	actingCombatant.find_child('Sprite2D').material = null
+	for target in selectedTargets:
+		target.find_child('Sprite2D').material = null
+	targetUpdated.emit([actingCombatant] + selectedTargets)
+	toggleStatusUIVisibility.emit(false)
+	actionState = "combatStart"
 	
 func TargetSelectState():
 	
@@ -238,17 +259,7 @@ func TargetSelectState():
 		
 		if selectedTargets.size() == currentMove.maxTargets or combatants.size() - 1 == selectedTargets.size():
 			# Initialize a bunch of stuff for future states
-			var centroid = selectedTargets.reduce(func(accum, target): return accum + target.position, Vector2(0, 0)) / selectedTargets.size()
-			var vel = Vector2(centroid - actingCombatant.global_position)
-			var normalizedVelocity = vel / vel.length()
-			returnPosition = actingCombatant.global_position
-			actingCombatant.velocity = normalizedVelocity * 120
-			actingCombatant.find_child('Sprite2D').material = null
-			for target in selectedTargets:
-				target.find_child('Sprite2D').material = null
-			targetUpdated.emit([actingCombatant] + selectedTargets)
-			toggleStatusUIVisibility.emit(false)
-			actionState = "combatStart"
+			prepareCombat()
 		
 func CombatStartState():
 	## TODO: move somewhere else so it's only calculated once
@@ -276,18 +287,20 @@ func CombatResetState():
 	if tweenCounter == tweens.size():
 		for tw in tweens:
 			tw.kill()
-		actingCombatant.global_position = returnPosition
-		actingCombatant.velocity = Vector2(0, 0)
 		actingCombatant.turnEndActionGauge()
 		for combatant : Combatant in combatants:
 			combatant.targetted = false
+			combatant.global_position = combatant.baseBattlePosition
+			combatant.velocity = Vector2(0, 0)
 		selectedCombo = null
 		resetBattleCamera.emit()
 		resetSelectionUI.emit()
 		playerAction = false
 		enemyAction = false
 		actingCombatant = null
-		actionState = "actionSelect"
+		selectedTargets = []
+		tweens = []
+		actionState = ""
 
 
 func _ready():
@@ -315,11 +328,13 @@ func _ready():
 	var spacing : float = cameraHeight / allies.size()
 	for i in range(allies.size()):
 		var pos = Vector2(-100 , spacing - spacing * i)
+		allies[i].baseBattlePosition = pos
 		allies[i].global_position = pos
 
 	spacing = cameraHeight / enemies.size()
 	for i in range(enemies.size()):
 		var pos = Vector2(100, spacing / 2 - spacing * i)
+		enemies[i].baseBattlePosition = pos
 		enemies[i].global_position = pos
 	
 	linkedAllies = CircularDoubleLinkedList.new()
@@ -348,10 +363,10 @@ func _process(delta):
 			"combatReset": CombatResetState()
 				
 	elif enemyAction:
-		# Enemy turn
-		enemyAction = false
-		# Enemy does its action
-		actingCombatant._action()
-		CombatResetState()
+		match actionState:
+			"AISelect": ActionSelectState()
+			"combatStart": CombatStartState()
+			"combatExecution": CombatExecutionState()
+			"combatReset": CombatResetState()
 	else:
 		actionGaugeAdvance.emit()

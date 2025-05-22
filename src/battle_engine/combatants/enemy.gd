@@ -3,9 +3,8 @@ extends Combatant
 
 @onready var battle = self.get_parent().get_parent().get_parent()
 
-var healthBar = null
 # Signals to get move and target from enemy
-signal enemySignal(enemy, target, move)
+signal enemySignal(enemy : Enemy, targets : Array[Combatant], move : Combo)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -26,10 +25,11 @@ func _ready():
 	
 
 func _action():
-	var target = self._assess_targets(self.owner.allies)
+	var targets : Array[Combatant] = []
+	targets.append(self._assess_targets(self.owner.allies))
 	# Randomly selects a move for now
 	var move = self.comboChains[randi() % comboChains.size()]
-	enemySignal.emit(self, target, move)
+	enemySignal.emit(self, targets, move)
 	
 	
 func _assess_targets(targets):
@@ -39,4 +39,4 @@ func _assess_targets(targets):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	pass
+	move_and_slide()

@@ -8,7 +8,6 @@ extends Combatant
 #@onready var animationPlayer : AnimationPlayer = $AnimationPlayer
 
 var movementSpd = 0 ##spd
-var isAttacking = false ## True if this ally is currently engaging in a combo or attack
 
 var acceleration = 1 ## Animation movement acceleration
 
@@ -21,18 +20,6 @@ var healthBar = null
 func _ready():
 
 	super._ready()
-	
-	# Create an area equivalent to the size of the collision box for overlapping detections
-	overlappingCollisionArea = Area2D.new()
-	var areaCollision = CollisionShape2D.new()
-	var rectShape = RectangleShape2D.new()
-	
-	rectShape.size = collisionShape.shape.size
-	areaCollision.shape = rectShape
-	
-	# Add to tree
-	self.add_child(overlappingCollisionArea)
-	overlappingCollisionArea.add_child(areaCollision)
 
 	self.moves = [
 		load("res://src/battle_engine/resources/moves/sword_slash.tres"),
@@ -44,26 +31,8 @@ func _ready():
 		load("res://src/battle_engine/resources/combos/swordSlashDouble.tres"),
 		load("res://src/battle_engine/resources/combos/sliceAndSkewer.tres")
 	]
-			
-
-func _action():
-	pass
 	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-		
-	movementSpd = velocity.length()
-
-	if movementSpd > 0:
-		velocity *= acceleration
-#
-	if movementSpd < 0.01:
-		velocity = Vector2(0, 0)
-		acceleration = 1
-
 	move_and_slide()
-		
-	for i in range(get_slide_collision_count() - 1):
-		var collision = get_slide_collision(i)
-		print(collision.get_collider())

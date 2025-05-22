@@ -1,5 +1,6 @@
-[gd_resource type="Resource" script_class="TweenProperty" load_steps=2 format=3 uid="uid://bdpur8t0rbwdj"]
+[gd_resource type="Resource" script_class="TweenProperty" load_steps=3 format=3 uid="uid://bdpur8t0rbwdj"]
 
+[ext_resource type="Resource" uid="uid://b5qubmk4i4sfr" path="res://src/battle_engine/resources/tweenCallback/swordSlashAttackerC1.tres" id="1_0vj0q"]
 [ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_fbasx"]
 
 [resource]
@@ -9,4 +10,5 @@ calcKey = "EquationOfLine"
 calcArguments = [2.0]
 duration = 1.0
 transition = 5
+parallelCallable = ExtResource("1_0vj0q")
 metadata/_custom_type_script = "uid://1371cmni8esf"

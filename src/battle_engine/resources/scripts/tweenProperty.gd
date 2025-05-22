@@ -11,19 +11,23 @@ var calcDict : Dictionary = {
 @export var calcArguments : Array
 @export var duration : float
 @export var transition : Tween.TransitionType
+@export var parallelCallable : TweenCallback
+
 
 func _init(
 	property = "position",
 	calcKey = "EquationOfLine",
 	calcArguments = [],
 	duration = 1.0,
-	transition = Tween.TRANS_LINEAR
+	transition = Tween.TRANS_LINEAR,
+	parallelCallable = null
 	) -> void:
 	self.property = property
 	self.calcKey = calcKey
 	self.calcArguments = calcArguments
 	self.duration = duration
 	self.transition = transition
+	self.parallelCallable = parallelCallable
 	
 
 ## Finds a position relative the the line formed by two vectors
