@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Turn Based"
-run/main_scene="res://src/main/game.tscn"
+run/main_scene="uid://bhnyyu8t00bk5"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 

@@ -8,7 +8,7 @@ extends Node2D
 @onready var cameraFocus = $BattleCamera/CenterFocus
 @onready var reactionPath = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath
 @onready var reactionClickArea = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath/ClickArea
-@onready var battleUI = $UILayer/BattleUI
+@onready var statUIs = $UILayer/BattleUI/StatUIs
 @onready var turnOrder = $UILayer/BattleUI/HorizontalContainer
 
 ## Load shaders
@@ -71,9 +71,6 @@ func characterTurn(nextCombatant: Combatant):
 		actingCombatant = nextCombatant
 		enemyAction = true
 		actionState = "AISelect"
-	
-	updateStatusUI.emit(actingCombatant)
-	
 
 ## *Signal Function*
 ## Emits when overlappingCollisionArea "body_entered" signal is triggered in ally.gd (built-in node signal)
@@ -292,6 +289,8 @@ func CombatResetState():
 			combatant.targetted = false
 			combatant.global_position = combatant.baseBattlePosition
 			combatant.velocity = Vector2(0, 0)
+		for ui : AllyStatusUI in statUIs.get_children():
+			ui.updateCharacter()
 		selectedCombo = null
 		resetBattleCamera.emit()
 		resetSelectionUI.emit()
@@ -307,11 +306,6 @@ func CombatResetState():
 func _ready():
 	combatants = get_tree().get_nodes_in_group("Combatants")
 	
-	var statUI : CharacterStatusUI = characterStatusUI.instantiate()
-	battleUI.add_child(statUI)
-	
-	updateStatusUI.connect(statUI.updateCharacter)
-	toggleStatusUIVisibility.connect(statUI.toggleVisibility)
 	resetBattleCamera.connect(camera.doCameraReset)
 	queueInputsForReaction.connect(reactionPath.addFollowers)
 	targetUpdated.connect(cameraFocus.updateTargetPoints)
@@ -339,15 +333,21 @@ func _ready():
 		enemies[i].global_position = pos
 	
 	linkedAllies = CircularDoubleLinkedList.new()
-	for ally in allies:
+	for ally : Ally in allies:
 		linkedAllies.append(ally)
+		var scene = characterStatusUI.instantiate()
+		scene.set_script(AllyStatusUI)
+		var statUI : AllyStatusUI = scene
+		statUIs.add_child(statUI)
+		statUI.setCombatant(ally)
+		statUI.updateCharacter()
 	
 	linkedEnemies = CircularDoubleLinkedList.new()
-	for enemy in enemies:
+	for enemy : Enemy in enemies:
 		linkedEnemies.append(enemy)
 		
 	selectedList = linkedEnemies
-		
+			
 	for combatant : Combatant in combatants:
 		actionGaugeAdvance.connect(combatant.actionAdvanceGauge)
 		combatant.set_collision_mask_value(1, false)

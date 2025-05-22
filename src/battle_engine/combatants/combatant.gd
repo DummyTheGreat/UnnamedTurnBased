@@ -20,6 +20,7 @@ var baseBattlePosition : Vector2 = Vector2(0, 0)
 
 var combatID : int ## Unique identifier used in combat
 	
+signal characterTurn(character : Combatant)
 
 func _init() -> void:
 	combatID = Globals.combatantID
@@ -43,5 +44,3 @@ func actionAdvanceGauge() -> void:
 
 func turnEndActionGauge() -> void:
 	actionGauge += defaultActionGauge
-
-signal characterTurn(character : Combatant)
