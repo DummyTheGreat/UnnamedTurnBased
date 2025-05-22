@@ -118,7 +118,7 @@ func processEnemyTurn(enemy : Enemy, targets : Array[Combatant], move : Combo):
 	comboIndex = 0
 	currentMove = selectedCombo.comboList[comboIndex]
 	selectedTargets = targets
-	_process_damage(targets[0], move.comboList[0].damage)
+	#_process_damage(targets[0], move.comboList[0].damage)
 	prepareCombat()
 
 
@@ -300,6 +300,7 @@ func CombatResetState():
 		actingCombatant = null
 		selectedTargets = []
 		tweens = []
+		tweenCounter = 0
 		actionState = ""
 
 
@@ -349,6 +350,7 @@ func _ready():
 		
 	for combatant : Combatant in combatants:
 		actionGaugeAdvance.connect(combatant.actionAdvanceGauge)
+		combatant.set_collision_mask_value(1, false)
 					
 			
 func _process(delta):
