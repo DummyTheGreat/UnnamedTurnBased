@@ -21,6 +21,7 @@ class_name CombatMove
 @export var recieverAnimationEase : Tween.EaseType
 @export var recieverAnimationProperties : Array[TweenProperty]
 
+
 func _init(
 	name : String = "",
 	weapon : int = 0, 

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_x1mew")
 property = "position"
-calcKey = "ShiftRecieverByDistance"
+calcKey = 1
 calcArguments = [Vector2(0, 0)]
 duration = 0.5
 transition = 9

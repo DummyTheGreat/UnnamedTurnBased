@@ -51,7 +51,7 @@ func setCombatant(combatant : Combatant):
 
 
 func updateCharacter():
-	
+		
 	healthPoints.max_value = registeredCombatant.max_health
 	healthPoints.value = registeredCombatant.current_health
 	healthValue.text = str(registeredCombatant.current_health)

@@ -9,10 +9,12 @@ extends Node2D
 @onready var reactionPath = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath
 @onready var reactionClickArea = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath/ClickArea
 @onready var statUIs = $UILayer/BattleUI/StatUIs
+@onready var targetStats = $UILayer/BattleUI/TargetStats
 @onready var turnOrder = $UILayer/BattleUI/HorizontalContainer
 
-## Load shaders
-@onready var selectShader = preload("res://assets/shaders/allySelectedShader.tres")
+## Load shader materials
+@onready var selectShader = preload("res://assets/materials/allySelectedShader.tres")
+@onready var pendingUIMaterial = preload("res://assets/materials/PendingUI.tres")
 
 ## Scenes
 @onready var selectionUI = preload("res://src/battle_engine/UI/SelectionUI.tscn")
@@ -37,6 +39,7 @@ var actionType : String
 var tweens : Array[Tween] ## A type of animation
 var tweenCounter : int ## Track how many tweens have finished
 var turnOrderNode: TurnOrderUI = null
+var pendingTargetTween : Tween
 
 signal resetBattleCamera() ## Emits to battleCamera -> doCameraReset
 signal resetSelectionUI() ## Emits to selectionUI -> resetUI
@@ -80,6 +83,13 @@ func _process_damage(body: Node2D, damage: int):
 	body.current_health -= damage
 	pass
 	
+func applyPendingSelectionTween(node : Node) -> Tween:
+	var pendingSelectionTween = get_tree().create_tween()
+	pendingSelectionTween.tween_property(node, "modulate:a", 0.5, 0.5)
+	pendingSelectionTween.tween_property(node, "modulate:a", 1, 0.5)
+	pendingSelectionTween.set_loops()
+	return pendingSelectionTween	
+
 ## *Signal Function*
 ## Emits when a selection is made from SelectionUI (Button press)
 func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
@@ -106,6 +116,17 @@ func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
 	selected.find_child('Sprite2D').material = selectShader
 	comboIndex = 0
 	currentMove = selectedCombo.comboList[comboIndex]
+	
+	var scene = characterStatusUI.instantiate()
+	scene.set_script(CharacterStatusUI)
+	var targetUI : CharacterStatusUI = scene
+	targetStats.add_child(targetUI)
+	targetUI.setCombatant(selected)
+	targetUI.updateCharacter()
+	if pendingTargetTween != null:
+		pendingTargetTween.kill()
+	pendingTargetTween = applyPendingSelectionTween(targetUI)
+	
 	actionState = "targetSelect"
 	
 ## Processes enemy turn. Takes target and move selection from enemy signal
@@ -216,7 +237,7 @@ func processTargetSelectChange(inputMapping: String):
 	elif inputMapping == "move_up":
 		selectedList.pointer = selectedList.pointer.prev
 		while selectedList.pointer.data.targetted:
-			selectedList.pointer.pointer = selectedList.pointer.prev
+			selectedList.pointer = selectedList.pointer.prev
 	else:
 		selectedList = linkedAllies if selectedList == linkedEnemies else linkedEnemies
 
@@ -224,6 +245,10 @@ func processTargetSelectChange(inputMapping: String):
 		selected.find_child('Sprite2D').material = null
 	selected = selectedList.pointer.data
 	selected.find_child('Sprite2D').material = selectShader
+	
+	var hoveredEnemyStats = targetStats.get_child(-1)
+	hoveredEnemyStats.setCombatant(selected)
+	hoveredEnemyStats.updateCharacter()
 
 func prepareCombat():
 	var centroid = selectedTargets.reduce(func(accum, target): return accum + target.position, Vector2(0, 0)) / selectedTargets.size()
@@ -255,8 +280,22 @@ func TargetSelectState():
 		selectedTargets.append(selected)
 		
 		if selectedTargets.size() == currentMove.maxTargets or combatants.size() - 1 == selectedTargets.size():
+			targetStats.get_child(-1).modulate.a = 1.0
+			pendingTargetTween.kill()
 			# Initialize a bunch of stuff for future states
 			prepareCombat()
+		else:
+			# Add another target UI
+			var scene = characterStatusUI.instantiate()
+			scene.set_script(CharacterStatusUI)
+			var targetUI : CharacterStatusUI = scene
+			targetStats.add_child(targetUI)
+			targetUI.setCombatant(selected)
+			targetUI.updateCharacter()
+			if pendingTargetTween != null:
+				targetStats.get_child(-2).modulate.a = 1.0
+				pendingTargetTween.kill()
+			pendingTargetTween = applyPendingSelectionTween(targetUI)
 		
 func CombatStartState():
 	## TODO: move somewhere else so it's only calculated once
@@ -291,6 +330,9 @@ func CombatResetState():
 			combatant.velocity = Vector2(0, 0)
 		for ui : AllyStatusUI in statUIs.get_children():
 			ui.updateCharacter()
+		for ui : CharacterStatusUI in targetStats.get_children():
+			targetStats.remove_child(ui)
+			ui.queue_free()
 		selectedCombo = null
 		resetBattleCamera.emit()
 		resetSelectionUI.emit()

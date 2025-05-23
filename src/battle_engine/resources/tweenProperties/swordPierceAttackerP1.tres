@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_oxl7q")
 property = "position"
-calcKey = "EquationOfLine"
+calcKey = 0
 calcArguments = [1.0]
 duration = 1.0
 transition = 4

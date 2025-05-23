@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_iaq4j")
-callKey = "reduceHealth"
+callKey = 0
 delay = 0.5
 callableArguments = [4]
 metadata/_custom_type_script = "uid://br4d4xjg0dp3"

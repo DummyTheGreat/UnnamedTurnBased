@@ -1,13 +1,15 @@
 extends Resource
 class_name TweenProperty
 
+enum Funcs {EquationOfLine, ShiftRecieverByDistance}
+
 var calcDict : Dictionary = {
-	"EquationOfLine" : EquationOfLine,
-	"ShiftRecieverByDistance" : ShiftRecieverByDistance
+	Funcs.EquationOfLine : EquationOfLine,
+	Funcs.ShiftRecieverByDistance : ShiftRecieverByDistance
 }
 
 @export var property : String
-@export var calcKey : String
+@export var calcKey : Funcs
 @export var calcArguments : Array
 @export var duration : float
 @export var transition : Tween.TransitionType
@@ -16,7 +18,7 @@ var calcDict : Dictionary = {
 
 func _init(
 	property = "position",
-	calcKey = "EquationOfLine",
+	calcKey = Funcs.EquationOfLine,
 	calcArguments = [],
 	duration = 1.0,
 	transition = Tween.TRANS_LINEAR,

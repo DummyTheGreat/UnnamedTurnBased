@@ -1,16 +1,18 @@
 extends Resource
 class_name TweenCallback
 
+enum Funcs {ReduceHealth}
+
 var callDict : Dictionary = {
-	"reduceHealth" : reduceHealth,
+	Funcs.ReduceHealth : reduceHealth,
 }
 
-@export var callKey : String
+@export var callKey : Funcs
 @export var delay : float
 @export var callableArguments : Array
 
 func _init(
-	callKey : String = "reduceHealth", 
+	callKey : Funcs = Funcs.ReduceHealth, 
 	delay : float = 1.0, 
 	callableArguments : Array = []) -> void:
 	self.callKey = callKey
