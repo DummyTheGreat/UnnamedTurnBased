@@ -121,6 +121,7 @@ func _list_button_pressed(selectionChoice: String, listChoice: String) -> void:
 	pivotPoint.visible = false
 	initCombatState.emit(selectionChoice, listChoice)
 	
+	
 ## *Signal Function*
 ## Emitted by battle.gd upon combat reset
 func resetUI():

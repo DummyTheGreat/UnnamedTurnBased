@@ -38,6 +38,10 @@ signal actionGaugeAdvance() ## Emits to characterStats -> actionGaugeAdvance
 signal turnEndActionGauge() ## Emits to characterStats -> turnEndActionGauge
 signal queueInputsForReaction() ## Emits to reactionPath -> addFollowers
 signal targetUpdated(targets : Array) ## Emits to battleField -> targetUpdated
+signal updateTurnOrder() ## Emits to turnOrder -> updateList
+signal addTempTurnOrder(character: CharacterStats, actionValue: int) ## Emits to turnOrder -> addTemp
+signal removeTempTurnOrder() ## Emits to turnOrder -> removeTemp
+
 
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
 func _customSpeedSort(a : TurnOrder, b : TurnOrder):
@@ -46,6 +50,7 @@ func _customSpeedSort(a : TurnOrder, b : TurnOrder):
 func characterTurn(actingCharacter: CharacterStats):
 	print(actingCharacter.name)
 	print(actingCharacter.actionGauge)
+	updateTurnOrder.emit()
 	if actingCharacter is Ally:
 		
 		selectedAlly = actingCharacter
@@ -92,6 +97,7 @@ func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
 	## TODO: Temporary, change to dynamic selector based on history (last turn)
 	selectedEnemy = enemies[0]
 	selectedEnemy.find_child('Sprite2D').material = selectShader
+	addTempTurnOrder.emit(selectedAlly, selectedAlly.defaultActionGauge/selectedAlly.speed)
 	actionState = "targetSelect"
 
 
@@ -219,6 +225,7 @@ func TargetSelectState():
 		targetUpdated.emit([selectedAlly, selectedEnemy])
 		comboIndex = 0
 		currentMove = selectedCombo.comboList[comboIndex]
+		
 		actionState = "combatStart"
 		
 func CombatStartState():
@@ -255,6 +262,7 @@ func CombatResetState():
 		playerAction = false
 		selectedAlly = null
 		actionState = "actionSelect"
+		removeTempTurnOrder.emit()
 
 
 func _ready():
@@ -266,10 +274,10 @@ func _ready():
 	turnOrderNode = turnOrderUI.instantiate()
 	turnOrder.add_child(turnOrderNode)
 	turnOrderNode.inputList(combatants)
-	#get rid of later
 	turnOrder.move_child(turnOrderNode, 0)
-	
-	
+	updateTurnOrder.connect(turnOrderNode.updateList)
+	addTempTurnOrder.connect(turnOrderNode.addTemp)
+	removeTempTurnOrder.connect(turnOrderNode.removeTemp)
 	# populate allies and enemies groups here, temporarily static
 	var cameraHeight : float = 108 * 2
 	assert(allies.size() != 0)
@@ -294,7 +302,6 @@ func _ready():
 func _process(delta):
 	
 	if playerAction:
-		turnOrderNode.updateList()
 		match actionState:
 			"actionSelect": ActionSelectState()
 			"targetSelect": TargetSelectState()
