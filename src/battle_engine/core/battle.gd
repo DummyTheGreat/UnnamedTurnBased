@@ -58,8 +58,8 @@ func _customSpeedSort(a : TurnOrder, b : TurnOrder):
 		return (a.speed > b.speed)
 
 func characterTurn(nextCombatant: Combatant):
-	#if actingCombatant != null:
-		#return
+	if actingCombatant != null:
+		return
 	updateTurnOrder.emit()
 	if nextCombatant is Ally:
 		actingCombatant = nextCombatant
@@ -349,7 +349,7 @@ func CombatResetState():
 		removeTempTurnOrder.emit()
 
 func _ready():
-	var combatants = get_tree().get_nodes_in_group("Combatants")
+	combatants = get_tree().get_nodes_in_group("Combatants")
 	
 	resetBattleCamera.connect(camera.doCameraReset)
 	queueInputsForReaction.connect(reactionPath.addFollowers)
