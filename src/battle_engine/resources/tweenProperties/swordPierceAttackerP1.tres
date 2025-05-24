@@ -6,7 +6,7 @@
 script = ExtResource("1_oxl7q")
 property = "position"
 calcKey = 0
-calcArguments = [1.0]
+calcArguments = [2.5]
 duration = 1.0
-transition = 4
+transition = 5
 metadata/_custom_type_script = "uid://1371cmni8esf"

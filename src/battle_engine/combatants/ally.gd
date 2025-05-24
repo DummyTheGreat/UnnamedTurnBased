@@ -31,8 +31,3 @@ func _ready():
 		load("res://src/battle_engine/resources/combos/swordSlashDouble.tres"),
 		load("res://src/battle_engine/resources/combos/sliceAndSkewer.tres")
 	]
-	
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	move_and_slide()

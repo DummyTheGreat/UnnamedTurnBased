@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://0trecvay4klq"]
+
+[ext_resource type="Script" uid="uid://6e340derkqx7" path="res://src/dev/generateMove.gd" id="1_7rcpm"]
+
+[node name="GenerateMove" type="Node"]
+script = ExtResource("1_7rcpm")

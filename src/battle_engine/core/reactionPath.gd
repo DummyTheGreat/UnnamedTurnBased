@@ -1,5 +1,7 @@
 extends Path2D
 
+@onready var clickArea : Area2D = $ClickArea
+
 signal endReactionWindow()
 signal initiateCombatExecution(timeSummation : float)
 
@@ -12,7 +14,6 @@ func addFollowers(moveList : Array) -> void:
 		var follower = ReactionPathFollower.new(move.attackVariant, move.reactionTime, prevFollower)
 		self.add_child(follower)
 		prevFollower = follower
-	self.child_order_changed.connect(handleFollowerRemoval)
 	initiateCombatExecution.emit(timeSummation)
 
 ## *Signal Function*
@@ -25,5 +26,7 @@ func _ready() -> void:
 	var battle = get_parent().get_parent().get_parent().get_parent().get_parent()
 	endReactionWindow.connect(battle.endCombatExecutionState)
 	initiateCombatExecution.connect(battle.beginCombatExecutionState)
+	self.child_order_changed.connect(handleFollowerRemoval)
+	clickArea.area_exited.connect(self.owner.nextComboIndex)
 	
 	

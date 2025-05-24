@@ -49,6 +49,11 @@ func _ready() -> void:
 	rectShape.size = Vector2(60, 60)
 	collisionBox.shape = rectShape
 	reactionArea.add_child(collisionBox)
+	reactionArea.set_collision_layer_value(1, false)
+	reactionArea.set_collision_layer_value(2, true)
+	reactionArea.set_collision_mask_value(1, false)
+	reactionArea.set_collision_mask_value(2, true)
+	
 	
 	self.add_child(timer)
 	self.add_child(label)

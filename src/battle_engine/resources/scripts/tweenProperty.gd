@@ -43,3 +43,4 @@ func EquationOfLine(attacker : Combatant, reciever : Combatant, scale : float) -
 func ShiftRecieverByDistance(reciever : Combatant, distance : Vector2) -> Vector2:
 	return reciever.position + distance
 	
+	

@@ -35,8 +35,3 @@ func _action():
 func _assess_targets(targets):
 	# Random target selection
 	return targets[randi() % targets.size()]
-		
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	move_and_slide()

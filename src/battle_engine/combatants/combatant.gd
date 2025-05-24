@@ -3,6 +3,8 @@ class_name Combatant
 
 ## Parent node of combatant types for defining their stats and identifiers
 
+@onready var collider : CollisionShape2D = $CollisionShape2D
+
 @export var max_health: int = 20
 @export var current_health: int = 20 ## Cannot be greater than max_health
 @export var base_damage: int = 5 ## Scaled by modifiers
@@ -17,20 +19,12 @@ class_name Combatant
 
 var targetted : bool = false
 var baseBattlePosition : Vector2 = Vector2(0, 0)
+var following : Combatant = null
 
 var combatID : int ## Unique identifier used in combat
 	
 signal characterTurn(character : Combatant)
 
-func _init() -> void:
-	combatID = Globals.combatantID
-	Globals.combatantID += 1
-	actionGauge = defaultActionGauge
-
-func _ready() -> void:
-	characterTurn.connect(self.get_parent().get_parent().get_parent().characterTurn)
-	actionValue = actionGauge / speed
-	
 func turnPassed() -> void:
 	if actionGauge >= 0 :
 		actionGauge -= speed
@@ -44,3 +38,32 @@ func actionAdvanceGauge() -> void:
 
 func turnEndActionGauge() -> void:
 	actionGauge += defaultActionGauge
+	
+func _init() -> void:
+	combatID = Globals.combatantID
+	Globals.combatantID += 1
+	actionGauge = defaultActionGauge
+	
+func recieveArea(area : Area2D):
+	print(area.get_parent())
+	pass
+
+func _ready() -> void:
+	characterTurn.connect(self.get_parent().get_parent().get_parent().characterTurn)
+	actionValue = actionGauge / speed
+	
+	var collisionArea = Area2D.new()
+	collisionArea.name = "CollisionArea"
+	self.add_child(collisionArea)
+	var collisionShape = CollisionShape2D.new()
+	collisionShape.name = "CollisionAreaShape"
+	collisionShape.shape = self.collider.shape
+	collisionArea.add_child(collisionShape)
+	collisionArea.area_entered.connect(self.owner.handleCombatantAreaEntered.bind(collisionArea))
+	
+	
+func _process(delta: float) -> void:
+	if following != null:
+		self.position = following.position + Vector2(30, 0)
+	self.move_and_slide()
+		

@@ -1,4 +1,5 @@
 extends Control
+class_name SelectionUI
 
 @onready var selectionTheme = preload("res://assets/themes/battleSelectionTheme.tres")
 
@@ -13,7 +14,7 @@ func _ready() -> void:
 	var battleEngine = self.get_parent().get_parent().get_parent().get_parent()
 	
 	# Signal Connections
-	initCombatState.connect(battleEngine.read_ui_input_data)
+	initCombatState.connect(battleEngine.readUIInputData)
 	
 	# Self initialization
 	var textureSize = Vector2(32, 32)

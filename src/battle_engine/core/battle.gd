@@ -95,7 +95,7 @@ func applyPendingSelectionTween(node : Node) -> Tween:
 
 ## *Signal Function*
 ## Emits when a selection is made from SelectionUI (Button press)
-func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
+func readUIInputData(selectionChoice: String, listChoice: String) -> void:
 	var list : Array
 	if selectionChoice == "moves":
 		list = actingCombatant.moves
@@ -158,7 +158,7 @@ func tweenEnds(index : int) -> void:
 ## Emit recieved from reactionPath.gd
 func endCombatExecutionState() -> void:
 	actionState = "combatReset"
-	
+		
 	
 ## Handles movement tweening
 func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProperties : Array[TweenProperty], easeType : Tween.EaseType) -> void:
@@ -183,6 +183,7 @@ func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProper
 			finalValue, 
 			tProp.duration).set_trans(tProp.transition)
 			
+		# Used for timing based attacks
 		if tProp.parallelCallable != null:
 			var tCall : TweenCallback = tProp.parallelCallable
 			var effectCall : Callable = tCall.callDict[tCall.callKey]
@@ -191,6 +192,28 @@ func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProper
 			
 	tween.finished.connect(tweenEnds.bind(tweens.size()))
 	tweens.append(tween)
+	tween.play()
+	
+func handleCombatantAreaEntered(eneteringArea : Area2D, recievingArea : Area2D):
+	var enteringNode = eneteringArea.get_parent()
+	var recievingNode = recievingArea.get_parent()
+	var move : CombatMove = currentMove
+	print(move.name)
+	# If true, this is one of the targets of the attacker aka a reciever
+	if enteringNode == actingCombatant and move.damageProcessing == move.Processes.Collision:	
+		var attacker : Combatant = enteringNode
+		var reciever : Combatant = recievingNode
+		handleMovementTween(reciever, attacker, move.recieverAnimationProperties, move.recieverAnimationEase)
+		if move.moveEffect != move.Effects.None:
+			print(move.name)
+			var callable : Callable = move.effectDict[move.moveEffect]
+			callable.bindv(move.effectArguments).call(attacker, reciever)
+
+			
+func nextComboIndex(area : Area2D):
+	comboIndex += 1
+	if comboIndex < selectedCombo.comboList.size():
+		currentMove = selectedCombo.comboList[comboIndex]
 	
 ## Handles the user input during a quick-time combo string 
 ## @param attackVariant - The type of attack executed by the player determined by their input
@@ -215,15 +238,9 @@ func processComboInput(attackVariant: String, skillPointsUsed: int):
 
 			for reciever in selectedTargets:
 				handleMovementTween(attacker, reciever, move.attackerAnimationProperties, move.attackerAnimationEase)
-				handleMovementTween(reciever, attacker, move.recieverAnimationProperties, move.recieverAnimationEase)
-			
-			# Run tweens
-			for tween in tweens:
-				tween.play()
-			
-			comboIndex += 1
-			if comboIndex < selectedCombo.comboList.size():
-				currentMove = selectedCombo.comboList[comboIndex]
+				# Handled by collision if collision based
+				if move.damageProcessing == move.Processes.Timing:
+					handleMovementTween(reciever, attacker, move.recieverAnimationProperties, move.recieverAnimationEase)
 		else:
 			print("wrong!")
 			
@@ -331,6 +348,7 @@ func CombatResetState():
 			combatant.targetted = false
 			combatant.global_position = combatant.baseBattlePosition
 			combatant.velocity = Vector2(0, 0)
+			combatant.following = null
 		for ui : AllyStatusUI in statUIs.get_children():
 			ui.updateCharacter()
 		for ui : CharacterStatusUI in targetStats.get_children():
