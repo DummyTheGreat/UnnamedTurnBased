@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://doa6eyb6rakhx"]
+
+[ext_resource type="Script" uid="uid://cgrev8usnthuc" path="res://src/battle_engine/core/turnOrderUI.gd" id="1_vh1sh"]
+
+[node name="Turn-order" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_vh1sh")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0

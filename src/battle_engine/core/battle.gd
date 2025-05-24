@@ -14,7 +14,6 @@ extends Node2D
 
 ## Load shader materials
 @onready var selectShader = preload("res://assets/materials/allySelectedShader.tres")
-@onready var pendingUIMaterial = preload("res://assets/materials/PendingUI.tres")
 
 ## Scenes
 @onready var selectionUI = preload("res://src/battle_engine/UI/SelectionUI.tscn")
@@ -49,6 +48,9 @@ signal queueInputsForReaction() ## Emits to reactionPath -> addFollowers
 signal targetUpdated(targets : Array) ## Emits to battleField -> targetUpdated
 signal updateStatusUI(combatant : Combatant) ## Emits to characterStatusUI -> updateCharacter
 signal toggleStatusUIVisibility(visibility : bool) ## Emits to characterStatusUI -> toggleVisibility
+signal updateTurnOrder() ## Emits to turnOrder -> updateList
+signal addTempTurnOrder(character: Combatant, actionValue: int) ## Emits to turnOrder -> addTemp
+signal removeTempTurnOrder() ## Emits to turnOrder -> removeTemp
 
 
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
@@ -56,9 +58,9 @@ func _customSpeedSort(a : TurnOrder, b : TurnOrder):
 		return (a.speed > b.speed)
 
 func characterTurn(nextCombatant: Combatant):
-	if actingCombatant != null:
-		return
-		
+	#if actingCombatant != null:
+		#return
+	updateTurnOrder.emit()
 	if nextCombatant is Ally:
 		actingCombatant = nextCombatant
 		playerAction = true
@@ -74,6 +76,7 @@ func characterTurn(nextCombatant: Combatant):
 		actingCombatant = nextCombatant
 		enemyAction = true
 		actionState = "AISelect"
+
 
 ## *Signal Function*
 ## Emits when overlappingCollisionArea "body_entered" signal is triggered in ally.gd (built-in node signal)
@@ -116,6 +119,7 @@ func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
 	selected.find_child('Sprite2D').material = selectShader
 	comboIndex = 0
 	currentMove = selectedCombo.comboList[comboIndex]
+	addTempTurnOrder.emit(actingCombatant, actingCombatant.defaultActionGauge/actingCombatant.speed)
 	
 	var scene = characterStatusUI.instantiate()
 	scene.set_script(CharacterStatusUI)
@@ -126,7 +130,7 @@ func read_ui_input_data(selectionChoice: String, listChoice: String) -> void:
 	if pendingTargetTween != null:
 		pendingTargetTween.kill()
 	pendingTargetTween = applyPendingSelectionTween(targetUI)
-	
+
 	actionState = "targetSelect"
 	
 ## Processes enemy turn. Takes target and move selection from enemy signal
@@ -274,8 +278,7 @@ func TargetSelectState():
 	elif Input.is_action_just_pressed("move_left") or Input.is_action_just_pressed("move_right"):
 		processTargetSelectChange("move_horizontal")
 	
-	if Input.is_action_just_pressed("interact"):
-		
+	if Input.is_action_just_pressed("interact"):		
 		selected.targetted = true
 		selectedTargets.append(selected)
 		
@@ -343,10 +346,10 @@ func CombatResetState():
 		tweens = []
 		tweenCounter = 0
 		actionState = ""
-
+		removeTempTurnOrder.emit()
 
 func _ready():
-	combatants = get_tree().get_nodes_in_group("Combatants")
+	var combatants = get_tree().get_nodes_in_group("Combatants")
 	
 	resetBattleCamera.connect(camera.doCameraReset)
 	queueInputsForReaction.connect(reactionPath.addFollowers)
@@ -354,9 +357,10 @@ func _ready():
 	turnOrderNode = turnOrderUI.instantiate()
 	turnOrder.add_child(turnOrderNode)
 	turnOrderNode.inputList(combatants)
-	#get rid of later
 	turnOrder.move_child(turnOrderNode, 0)
-	
+	updateTurnOrder.connect(turnOrderNode.updateList)
+	addTempTurnOrder.connect(turnOrderNode.addTemp)
+	removeTempTurnOrder.connect(turnOrderNode.removeTemp)
 	
 	# populate allies and enemies groups here, temporarily static
 	var cameraHeight : float = 108 * 2
@@ -398,14 +402,12 @@ func _ready():
 func _process(delta):
 	
 	if playerAction:
-		turnOrderNode.updateList()
 		match actionState:
 			"actionSelect": ActionSelectState()
 			"targetSelect": TargetSelectState()
 			"combatStart": CombatStartState()
 			"combatExecution": CombatExecutionState()
 			"combatReset": CombatResetState()
-				
 	elif enemyAction:
 		match actionState:
 			"AISelect": ActionSelectState()

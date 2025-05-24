@@ -42,7 +42,10 @@ anchors_preset = -1
 anchor_right = 1.0
 offset_left = 20.0
 offset_top = 20.0
+<<<<<<< ours
 offset_right = -20.0
+=======
+>>>>>>> theirs
 
 [node name="ReactionUI" type="PanelContainer" parent="UILayer/BattleUI/HorizontalContainer"]
 layout_mode = 2
