@@ -62,4 +62,3 @@ func character_array_sort(a: TurnOrder, b: TurnOrder):
 	elif (aComb.actionValue + aTAV) == (bComb.actionValue + bTAV):
 		return aComb is Ally
 	return false
-		

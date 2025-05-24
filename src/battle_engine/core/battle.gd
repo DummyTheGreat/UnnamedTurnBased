@@ -18,7 +18,7 @@ extends Node2D
 ## Scenes
 @onready var selectionUI = preload("res://src/battle_engine/UI/SelectionUI.tscn")
 @onready var characterStatusUI = preload("res://src/battle_engine/UI/CharacterStatusUI.tscn")
-@onready var turnOrderUI = preload("res://src/battle_engine/UI/turn-order.tscn")
+@onready var turnOrderUI = preload("res://src/battle_engine/UI/turnOrder.tscn")
 
 var combatants : Array[Node] ## List of all combatants
 var actingCombatant : Combatant = null ## The ally combatant that the player is currently in control of
