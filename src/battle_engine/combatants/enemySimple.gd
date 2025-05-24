@@ -34,6 +34,7 @@ func _action():
 		for i in range(possibleMove.weight):
 			pool.append(possibleMove.name)
 	
+	var targets : Array[Combatant] = []
 	var poolindex = randi() % pool.size()
 	var selectedmove = pool[poolindex]
 	
@@ -41,7 +42,8 @@ func _action():
 		print("Enemy uses move!")
 		var target = self._assess_targets(self.owner.allies)
 		var move = self.comboChains[randi() % comboChains.size()]
-		enemySignal.emit(self, target, move)
+		targets.append(target)
+		enemySignal.emit(self, targets, move)
 	
 	if selectedmove == "combo":
 		## TODO Create combos for enemy (parry system)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bhnyyu8t00bk5"]
+[gd_scene load_steps=14 format=3 uid="uid://bhnyyu8t00bk5"]
 
 [ext_resource type="Script" uid="uid://3nfwogn7wtpw" path="res://src/battle_engine/core/battle.gd" id="1_cdclp"]
 [ext_resource type="Script" uid="uid://djkq5fl3aw3ri" path="res://src/battle_engine/core/reactionPath.gd" id="2_8a7v4"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://cmikbat7yp3p0" path="res://src/battle_engine/combatants/enemy.gd" id="4_7bqa5"]
 [ext_resource type="Script" uid="uid://bkl7g6d8pi8dr" path="res://src/battle_engine/core/cameraFocus.gd" id="4_x5rsb"]
 [ext_resource type="Script" uid="uid://dc2yv7280xtxg" path="res://src/battle_engine/core/battleCamera.gd" id="6_qwkl0"]
+[ext_resource type="Script" uid="uid://bibyrgdqbv8w5" path="res://src/battle_engine/combatants/enemySimple.gd" id="8_fkwuy"]
 
 [sub_resource type="Curve2D" id="Curve2D_s3orl"]
 _data = {
@@ -138,7 +139,7 @@ shape = SubResource("RectangleShape2D_qxmty")
 [node name="Enemies" type="Node2D" parent="Field"]
 
 [node name="TestEnemy1" type="CharacterBody2D" parent="Field/Enemies" groups=["Combatants", "Enemies"]]
-script = ExtResource("4_7bqa5")
+script = ExtResource("8_fkwuy")
 speed = 12
 characterName = "EnemyOne"
 
