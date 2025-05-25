@@ -6,16 +6,18 @@ extends Enemy
 
 var enemyWeights = [
 	{"name": "move", "weight": 5},
-	{"name": "combo", "weight": 2},
-	{"name": "skill", "weight": 2}
+	{"name": "combo", "weight": 1},
+	{"name": "skill", "weight": 1}
 ]
 
 # Targets lowest HP ally for now
 func _assess_targets(targets):
-	print("SIMPLE!")
 	# Variables to track lowest HP target
-	var low = INF
-	var availabletargets = []
+	var low : int = 2^63 - 1 # largest int value possible
+	var availabletargets : Array[Combatant] = []
+	
+	# Find the lowest health enemy
+	# Selects random if all healths are the same
 	for target in targets:
 		if target.current_health < low:
 			low = target.current_health
@@ -35,8 +37,8 @@ func _action():
 			pool.append(possibleMove.name)
 	
 	var targets : Array[Combatant] = []
-	var poolindex = randi() % pool.size()
-	var selectedmove = pool[poolindex]
+	var poolindex : int = randi() % pool.size()
+	var selectedmove : String = pool[poolindex]
 	
 	if selectedmove == "move": 
 		print("Enemy uses move!")
