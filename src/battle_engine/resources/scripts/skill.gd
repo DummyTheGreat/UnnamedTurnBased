@@ -1,6 +1,6 @@
 # Skill class resource
 extends Resource
-class_name SkillResource
+class_name Skill
 
 ## A Skill Move is a custom Data Object for a characters skill moves. It defines
 ## the different effects that a skill could have.

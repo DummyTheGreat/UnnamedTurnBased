@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://d2nohl65psyym"]
+
+[ext_resource type="Script" uid="uid://rjdqo662mf1x" path="res://src/battle_engine/resources/scripts/skill.gd" id="1_of6al"]
+
+[resource]
+script = ExtResource("1_of6al")
+name = "Heal"
+skillVariant = "Heal"
+cost = 3
+power = 10
+metadata/_custom_type_script = "uid://rjdqo662mf1x"
