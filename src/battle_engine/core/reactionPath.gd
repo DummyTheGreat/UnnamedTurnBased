@@ -10,8 +10,8 @@ signal initiateCombatExecution(timeSummation : float)
 func addFollowers(moveList : Array) -> void:
 	var timeSummation : float = 0
 	var prevFollower : ReactionPathFollower = null
-	for move in moveList:
-		var follower = ReactionPathFollower.new(move.attackVariant, move.reactionTime, prevFollower)
+	for move : CombatMove in moveList:
+		var follower = ReactionPathFollower.new(move.inputKeyName, move.reactionTime, prevFollower)
 		self.add_child(follower)
 		prevFollower = follower
 	initiateCombatExecution.emit(timeSummation)
@@ -27,6 +27,6 @@ func _ready() -> void:
 	endReactionWindow.connect(battle.endCombatExecutionState)
 	initiateCombatExecution.connect(battle.beginCombatExecutionState)
 	self.child_order_changed.connect(handleFollowerRemoval)
-	clickArea.area_exited.connect(self.owner.nextComboIndex)
+	#clickArea.area_exited.connect(self.owner.nextComboIndex)
 	
 	

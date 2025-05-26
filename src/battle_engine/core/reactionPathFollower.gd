@@ -1,5 +1,5 @@
-class_name ReactionPathFollower
 extends PathFollow2D
+class_name ReactionPathFollower
 
 ## A ReactionPathFollower holds the data for the type of input displayed for a reaction on the
 ## top reaction UI bar. It travels along the "ReactionPath" node.
@@ -9,7 +9,7 @@ extends PathFollow2D
 @onready var label : Label
 @onready var reactionArea : Area2D
 
-var attackVariant : String ## The type of attack variant that the requested input should match to
+var inputKeyName : StringName ## The type of attack variant that the requested input should match to
 var bufferTime : float ## The amount of time it takes for this node to fully traverse the path
 var prevFollower : ReactionPathFollower
 
@@ -24,8 +24,8 @@ func endFollower():
 	nextReaction.emit()
 	self.queue_free()
 
-func _init(p_attackVariant: String, p_bufferTime: float, prevFollower : ReactionPathFollower) -> void:
-	self.attackVariant = p_attackVariant
+func _init(p_inputKeyName: StringName, p_bufferTime: float, prevFollower : ReactionPathFollower) -> void:
+	self.inputKeyName = p_inputKeyName
 	self.bufferTime = p_bufferTime
 	self.prevFollower = prevFollower
 
@@ -39,7 +39,7 @@ func _ready() -> void:
 	timer.timeout.connect(endFollower)
 	
 	label = Label.new()
-	label.text = InputMap.action_get_events(attackVariant)[0].as_text().split(" ")[0]
+	label.text = InputMap.action_get_events(inputKeyName)[0].as_text().split(" ")[0]
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	

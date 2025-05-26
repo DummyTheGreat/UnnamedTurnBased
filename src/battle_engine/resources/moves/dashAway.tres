@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CombatMove" load_steps=3 format=3 uid="uid://frt6v56hf3u"]
+
+[ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_ma1n2"]
+[ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatMove.gd" id="2_xi8qi"]
+
+[resource]
+script = ExtResource("2_xi8qi")
+name = "Dash Away"
+weapon = -1
+damage = 0
+attackVariant = 3
+inputKeyName = &"MoveAway"
+reactionTime = 1.0
+minimumDistanceToTargets = 50
+maxTargets = 1
+damageProcessing = 1
+attackerAnimationEase = 0
+attackerAnimationProperties = Array[ExtResource("1_ma1n2")]([])
+recieverAnimationEase = 0
+recieverAnimationProperties = Array[ExtResource("1_ma1n2")]([])
+metadata/_custom_type_script = "uid://ba5a0kqfel84g"

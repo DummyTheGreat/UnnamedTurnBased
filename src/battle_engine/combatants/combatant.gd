@@ -19,7 +19,9 @@ class_name Combatant
 
 var targetted : bool = false
 var baseBattlePosition : Vector2 = Vector2(0, 0)
-var following : Combatant = null
+var tweenStartingPosition : Vector2 = Vector2(0, 0) ## Tweens are too fast, so memorizing the starting position helps with applying effects correctly
+var following : Combatant = null ## Who the combatant is "attached to"
+var followingOffset : Vector2 = Vector2(0, 0)
 
 var combatID : int ## Unique identifier used in combat
 	
@@ -44,9 +46,9 @@ func _init() -> void:
 	Globals.combatantID += 1
 	actionGauge = defaultActionGauge
 	
-func recieveArea(area : Area2D):
-	print(area.get_parent())
-	pass
+func attachToOther(leader : Combatant, offset : Vector2):
+	following = leader
+	followingOffset = offset
 
 func _ready() -> void:
 	characterTurn.connect(self.get_parent().get_parent().get_parent().characterTurn)
@@ -64,6 +66,6 @@ func _ready() -> void:
 	
 func _process(delta: float) -> void:
 	if following != null:
-		self.position = following.position + Vector2(30, 0)
+		self.position = following.position + followingOffset
 	self.move_and_slide()
 		

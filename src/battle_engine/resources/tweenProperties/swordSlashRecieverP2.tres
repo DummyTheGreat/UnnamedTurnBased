@@ -1,12 +1,15 @@
-[gd_resource type="Resource" script_class="TweenProperty" load_steps=2 format=3 uid="uid://dqtumv461m1tq"]
+[gd_resource type="Resource" script_class="TweenProperty" load_steps=3 format=3 uid="uid://dqtumv461m1tq"]
 
+[ext_resource type="Script" uid="uid://br4d4xjg0dp3" path="res://src/battle_engine/resources/scripts/tweenCallback.gd" id="1_5a148"]
 [ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_x1mew"]
 
 [resource]
 script = ExtResource("1_x1mew")
 property = "position"
-calcKey = 1
+calcKey = 2
 calcArguments = [Vector2(0, 0)]
 duration = 0.5
+delay = 0.0
 transition = 9
+callables = Array[ExtResource("1_5a148")]([])
 metadata/_custom_type_script = "uid://1371cmni8esf"

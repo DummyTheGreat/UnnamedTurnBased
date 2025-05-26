@@ -39,6 +39,9 @@ var tweens : Array[Tween] ## A type of animation
 var tweenCounter : int ## Track how many tweens have finished
 var turnOrderNode: TurnOrderUI = null
 var pendingTargetTween : Tween
+var actingCombatantOnLeft : bool = true
+var inputKeyD : InputEventKey
+var inputKeyA : InputEventKey
 
 signal resetBattleCamera() ## Emits to battleCamera -> doCameraReset
 signal resetSelectionUI() ## Emits to selectionUI -> resetUI
@@ -151,7 +154,11 @@ func beginCombatExecutionState(timeSummation: float) -> void:
 	
 ## *Signal Function*
 ## Emit recieved from Tween.finished
-func tweenEnds(index : int) -> void:
+func tweenEnds(index : int, tweenOwner : Combatant) -> void:
+	if tweenOwner == actingCombatant:
+		comboIndex += 1
+		if comboIndex < selectedCombo.comboList.size():
+			currentMove = selectedCombo.comboList[comboIndex]
 	tweenCounter += 1
 	
 ## *Signal Function*
@@ -169,7 +176,7 @@ func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProper
 	tween.pause()
 	tween.set_parallel(true)
 	tween.set_ease(easeType)
-	for tProp in tweenProperties:
+	for tProp : TweenProperty in tweenProperties:
 		
 		var movementCall : Callable = tProp.calcDict[tProp.calcKey].bindv(tProp.calcArguments)
 		var finalValue
@@ -180,17 +187,16 @@ func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProper
 		tween.chain().tween_property(
 			primary, 
 			tProp.property, 
-			finalValue, 
-			tProp.duration).set_trans(tProp.transition)
+			finalValue,
+			tProp.duration).set_trans(tProp.transition).set_delay(tProp.delay)
 			
-		# Used for timing based attacks
-		if tProp.parallelCallable != null:
-			var tCall : TweenCallback = tProp.parallelCallable
+		for tCall : TweenCallback in tProp.callables:
 			var effectCall : Callable = tCall.callDict[tCall.callKey]
-			effectCall = effectCall.bindv([secondary] + tCall.callableArguments)
+			effectCall = effectCall.bindv([primary, secondary] + tCall.callableArguments)
 			tween.tween_callback(effectCall).set_delay(tCall.delay)
 			
-	tween.finished.connect(tweenEnds.bind(tweens.size()))
+	primary.tweenStartingPosition = primary.position
+	tween.finished.connect(tweenEnds.bind(tweens.size(), primary))
 	tweens.append(tween)
 	tween.play()
 	
@@ -198,38 +204,26 @@ func handleCombatantAreaEntered(eneteringArea : Area2D, recievingArea : Area2D):
 	var enteringNode = eneteringArea.get_parent()
 	var recievingNode = recievingArea.get_parent()
 	var move : CombatMove = currentMove
-	print(move.name)
 	# If true, this is one of the targets of the attacker aka a reciever
 	if enteringNode == actingCombatant and move.damageProcessing == move.Processes.Collision:	
 		var attacker : Combatant = enteringNode
 		var reciever : Combatant = recievingNode
 		handleMovementTween(reciever, attacker, move.recieverAnimationProperties, move.recieverAnimationEase)
-		if move.moveEffect != move.Effects.None:
-			print(move.name)
-			var callable : Callable = move.effectDict[move.moveEffect]
-			callable.bindv(move.effectArguments).call(attacker, reciever)
-
-			
-func nextComboIndex(area : Area2D):
-	comboIndex += 1
-	if comboIndex < selectedCombo.comboList.size():
-		currentMove = selectedCombo.comboList[comboIndex]
 	
 ## Handles the user input during a quick-time combo string 
 ## @param attackVariant - The type of attack executed by the player determined by their input
 ## @param skillPointsUsed - The number of skill poitns to remove from the combatant
-func processComboInput(attackVariant: String, skillPointsUsed: int):
+func processComboInput(inputKeyName : StringName, skillPointsUsed : int):
 	
 	var queue = reactionClickArea.get_overlapping_areas()	
-		
 	if len(queue) > 0:
-		
-		#temp - get next move's distance boundary
-		var nextMoveDistance : int
-		if comboIndex + 1 < selectedCombo.comboList.size():
-			nextMoveDistance = selectedCombo.comboList[comboIndex + 1].minimumDistanceToTargets
-		
-		if (attackVariant == queue[0].get_parent().attackVariant):
+		var follower : ReactionPathFollower = queue[0].get_parent()
+		#
+		#var nextMoveDistance : int
+		#if comboIndex + 1 < selectedCombo.comboList.size():
+			#nextMoveDistance = selectedCombo.comboList[comboIndex + 1].minimumDistanceToTargets
+		print("FOLLOWER INPUT KEY", follower.inputKeyName)
+		if (inputKeyName == follower.inputKeyName):
 			var move : CombatMove = currentMove
 			## NOTE: Temporary assignments, will need to be dynamically assigned
 			var attacker = actingCombatant
@@ -241,6 +235,10 @@ func processComboInput(attackVariant: String, skillPointsUsed: int):
 				# Handled by collision if collision based
 				if move.damageProcessing == move.Processes.Timing:
 					handleMovementTween(reciever, attacker, move.recieverAnimationProperties, move.recieverAnimationEase)
+			
+			# Disable for reaction
+			queue[0].set_collision_layer_value(2, false)
+			queue[0].set_collision_mask_value(2, false)
 		else:
 			print("wrong!")
 			
@@ -249,13 +247,13 @@ func ActionSelectState():
 	if actingCombatant is Enemy:
 		actingCombatant._action()
 	
-func processTargetSelectChange(inputMapping: String):
+func processTargetSelectChange(inputMapping: StringName):
 	
-	if inputMapping == "move_down":
+	if inputMapping == "MoveDown":
 		selectedList.pointer = selectedList.pointer.next
 		while selectedList.pointer.data.targetted: # Skip characters already selected for targeting or acting
 			selectedList.pointer = selectedList.pointer.next
-	elif inputMapping == "move_up":
+	elif inputMapping == "MoveUp":
 		selectedList.pointer = selectedList.pointer.prev
 		while selectedList.pointer.data.targetted:
 			selectedList.pointer = selectedList.pointer.prev
@@ -286,16 +284,16 @@ func prepareCombat():
 	
 func TargetSelectState():
 	
-	if Input.is_action_just_pressed("move_down"):
-		processTargetSelectChange("move_down")
+	if Input.is_action_just_pressed("MoveDown"):
+		processTargetSelectChange("MoveDown")
 
-	elif Input.is_action_just_pressed("move_up"):
-		processTargetSelectChange("move_up")
+	elif Input.is_action_just_pressed("MoveUp"):
+		processTargetSelectChange("MoveUp")
 		
-	elif Input.is_action_just_pressed("move_left") or Input.is_action_just_pressed("move_right"):
-		processTargetSelectChange("move_horizontal")
+	elif Input.is_action_just_pressed("MoveLeft") or Input.is_action_just_pressed("MoveRight"):
+		processTargetSelectChange("MoveHorizontal")
 	
-	if Input.is_action_just_pressed("interact"):		
+	if Input.is_action_just_pressed("Interact"):		
 		selected.targetted = true
 		selectedTargets.append(selected)
 		
@@ -313,6 +311,7 @@ func TargetSelectState():
 			targetUI.setCombatant(selected)
 			targetUI.updateCharacter()
 			if pendingTargetTween != null:
+				##TODO: Fix this indexing this is stupid
 				targetStats.get_child(-2).modulate.a = 1.0
 				pendingTargetTween.kill()
 			pendingTargetTween = applyPendingSelectionTween(targetUI)
@@ -325,20 +324,58 @@ func CombatStartState():
 		).length() <= currentMove.minimumDistanceToTargets:
 		actingCombatant.velocity = Vector2(0, 0)
 		# Add inputs to reaction bar
-		#var timeSummation: float = 0
+		var xAvg = selectedTargets.reduce(func(accum, target): return accum + target.position.x, 0) / selectedTargets.size()
+		if actingCombatant.position.x <= xAvg: #WAS on the RIGHT, now on the LEFT
+			InputMap.action_erase_events("MoveTowards")
+			InputMap.action_add_event("MoveTowards", inputKeyD)
+			
+			InputMap.action_erase_events("MoveAway")
+			InputMap.action_add_event("MoveAway", inputKeyA)
+			actingCombatantOnLeft = true
+		elif actingCombatant.position.x > xAvg: # WAS on the LEFT, now on the RIGHT
+			InputMap.action_erase_events("MoveTowards")
+			InputMap.action_add_event("MoveTowards", inputKeyA)
+			
+			InputMap.action_erase_events("MoveAway")
+			InputMap.action_add_event("MoveAway", inputKeyD)
+			actingCombatantOnLeft = false
+		print(InputMap.action_has_event("MoveTowards", inputKeyA))
+		print(InputMap.action_has_event("MoveTowards", inputKeyD))
 		queueInputsForReaction.emit(selectedCombo.comboList)
 		
 func CombatExecutionState():
+	## TODO: I really don't want this to run constantly so it needs to move eventually
+	var xAvg = selectedTargets.reduce(func(accum, target): return accum + target.position.x, 0) / selectedTargets.size()
+	if !actingCombatantOnLeft and actingCombatant.position.x <= xAvg: #WAS on the RIGHT, now on the LEFT
+		InputMap.action_add_event("MoveTowards", inputKeyD)
+		InputMap.action_erase_event("MoveTowards", inputKeyA)
+		
+		InputMap.action_add_event("MoveAway", inputKeyA)
+		InputMap.action_erase_event("MoveAway", inputKeyD)
+		actingCombatantOnLeft = true
+	elif actingCombatantOnLeft and actingCombatant.position.x > xAvg: # WAS on the LEFT, now on the RIGHT
+		InputMap.action_add_event("MoveTowards", inputKeyA)
+		InputMap.action_erase_event("MoveTowards", inputKeyD)
+		
+		InputMap.action_add_event("MoveAway", inputKeyD)
+		InputMap.action_erase_event("MoveAway", inputKeyA)
+		actingCombatantOnLeft = false
 	
-	if Input.is_action_just_pressed("slash"):
-		processComboInput("slash", 2)
+	if Input.is_action_just_pressed("SlashAction"):
+		processComboInput("SlashAction", 2)
 		
-	elif Input.is_action_just_pressed("strike"):
-		processComboInput("strike", 4)
+	elif Input.is_action_just_pressed("PierceAction"):
+		processComboInput("PierceAction", 4)
 
-	elif Input.is_action_just_pressed("pierce"):
-		processComboInput("pierce", 3)
+	elif Input.is_action_just_pressed("StrikeAction"):
+		processComboInput("StrikeAction", 3)
 		
+	elif Input.is_action_just_pressed("MoveTowards"):
+		processComboInput("MoveTowards", 0)
+	
+	elif Input.is_action_just_pressed("MoveAway"):
+		processComboInput("MoveAway", 0)
+
 func CombatResetState():
 	if tweenCounter == tweens.size():
 		for tw in tweens:
@@ -367,18 +404,26 @@ func CombatResetState():
 		removeTempTurnOrder.emit()
 
 func _ready():
+	
 	combatants = get_tree().get_nodes_in_group("Combatants")
 	
-	resetBattleCamera.connect(camera.doCameraReset)
-	queueInputsForReaction.connect(reactionPath.addFollowers)
-	targetUpdated.connect(cameraFocus.updateTargetPoints)
 	turnOrderNode = turnOrderUI.instantiate()
 	turnOrder.add_child(turnOrderNode)
 	turnOrderNode.inputList(combatants)
 	turnOrder.move_child(turnOrderNode, 0)
+	
+	resetBattleCamera.connect(camera.doCameraReset)
+	queueInputsForReaction.connect(reactionPath.addFollowers)
+	targetUpdated.connect(cameraFocus.updateTargetPoints)
 	updateTurnOrder.connect(turnOrderNode.updateList)
 	addTempTurnOrder.connect(turnOrderNode.addTemp)
 	removeTempTurnOrder.connect(turnOrderNode.removeTemp)
+	
+	inputKeyD = InputEventKey.new()
+	inputKeyD.keycode = KEY_D
+	
+	inputKeyA = InputEventKey.new()
+	inputKeyA.keycode = KEY_A
 	
 	# populate allies and enemies groups here, temporarily static
 	var cameraHeight : float = 108 * 2
@@ -415,6 +460,7 @@ func _ready():
 	for combatant : Combatant in combatants:
 		actionGaugeAdvance.connect(combatant.actionAdvanceGauge)
 		combatant.set_collision_mask_value(1, false)
+
 					
 			
 func _process(delta):

@@ -1,9 +1,10 @@
 extends Resource
 class_name TweenProperty
 
-enum Funcs {EquationOfLine, ShiftRecieverByDistance}
+enum Funcs {None, EquationOfLine, ShiftRecieverByDistance}
 
 var calcDict : Dictionary = {
+	Funcs.None : None,
 	Funcs.EquationOfLine : EquationOfLine,
 	Funcs.ShiftRecieverByDistance : ShiftRecieverByDistance
 }
@@ -12,35 +13,41 @@ var calcDict : Dictionary = {
 @export var calcKey : Funcs
 @export var calcArguments : Array
 @export var duration : float
+@export var delay : float
 @export var transition : Tween.TransitionType
-@export var parallelCallable : TweenCallback
+@export var callables : Array[TweenCallback]
 
 
 func _init(
-	property = "position",
-	calcKey = Funcs.EquationOfLine,
-	calcArguments = [],
-	duration = 1.0,
-	transition = Tween.TRANS_LINEAR,
-	parallelCallable = null
+	property : String = "position",
+	calcKey : Funcs = Funcs.None,
+	calcArguments : Array = [],
+	duration : float = 1.0,
+	delay : float = 0.0,
+	transition : Tween.TransitionType = Tween.TRANS_LINEAR,
+	callables : Array[TweenCallback] = []
 	) -> void:
 	self.property = property
 	self.calcKey = calcKey
 	self.calcArguments = calcArguments
 	self.duration = duration
+	self.delay = delay
 	self.transition = transition
-	self.parallelCallable = parallelCallable
+	self.callables = callables
 	
 
+func None(primary : Combatant, secondary : Combatant):
+	return primary.position
+
 ## Finds a position relative the the line formed by two vectors
-func EquationOfLine(attacker : Combatant, reciever : Combatant, scale : float) -> Vector2:
+func EquationOfLine(primary : Combatant, secondary : Combatant, scale : float) -> Vector2:
 	return Vector2(
-		attacker.position.x + scale * (reciever.position.x - attacker.position.x),
-		attacker.position.y + scale * (reciever.position.y - attacker.position.y)
+		primary.position.x + scale * (secondary.position.x - primary.position.x),
+		primary.position.y + scale * (secondary.position.y - primary.position.y)
 	)
 	
 ## Knockback
-func ShiftRecieverByDistance(reciever : Combatant, distance : Vector2) -> Vector2:
-	return reciever.position + distance
+func ShiftRecieverByDistance(secondary : Combatant, distance : Vector2) -> Vector2:
+	return secondary.position + distance
 	
 	

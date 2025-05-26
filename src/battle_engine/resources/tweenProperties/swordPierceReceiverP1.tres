@@ -1,12 +1,16 @@
-[gd_resource type="Resource" script_class="TweenProperty" load_steps=2 format=3 uid="uid://n5tos4h4uhwm"]
+[gd_resource type="Resource" script_class="TweenProperty" load_steps=5 format=3 uid="uid://n5tos4h4uhwm"]
 
+[ext_resource type="Script" uid="uid://br4d4xjg0dp3" path="res://src/battle_engine/resources/scripts/tweenCallback.gd" id="1_h0ql8"]
 [ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_tyoog"]
+[ext_resource type="Resource" uid="uid://bammh2r2ap0f" path="res://src/battle_engine/resources/tweenCallback/SwordPierceReceiverP1C1.tres" id="2_di5eb"]
+[ext_resource type="Resource" uid="uid://06qm4ay60dj1" path="res://src/battle_engine/resources/tweenCallback/SwordPierceReceiverP1C2.tres" id="3_qeehe"]
 
 [resource]
 script = ExtResource("1_tyoog")
-property = ""
+property = "position"
 calcKey = 0
 calcArguments = []
 duration = 0.0
 transition = 0
+callables = Array[ExtResource("1_h0ql8")]([ExtResource("2_di5eb"), ExtResource("3_qeehe")])
 metadata/_custom_type_script = "uid://1371cmni8esf"
