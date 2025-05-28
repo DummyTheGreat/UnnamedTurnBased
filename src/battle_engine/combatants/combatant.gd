@@ -10,8 +10,8 @@ class_name Combatant
 @export var base_damage: int = 5 ## Scaled by modifiers
 @export var skill_points: int = 10 ## The number of available skill points to be use in a battle
 @export var speed: int = 10 ## Base speed
-@export var moves: Array[CombatMove] = [] ## A list of all SINGULAR moves available to the character
-@export var comboChains: Array[Combo] = [] ## A list of all combos available to the character
+@export var moves: Array[Move] = [] ## A list of all SINGULAR moves available to the character
+@export var combos: Array[Combo] = [] ## A list of all combos available to the character
 @export var characterName: String = "" ## In-game character name for display
 @export var defaultActionGauge: int = 1000 ##
 @export var actionGauge: int  ##Base Action Gauge

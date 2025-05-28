@@ -41,7 +41,7 @@ func _action():
 	if selectedmove == "move": 
 		print("Enemy uses move!")
 		var target = self._assess_targets(self.owner.allies)
-		var move = self.comboChains[randi() % comboChains.size()]
+		var move : Move = self.moves[randi() % moves.size()]
 		targets.append(target)
 		enemySignal.emit(self, targets, move)
 	

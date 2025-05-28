@@ -1,9 +1,5 @@
 extends Resource
-class_name CombatMove
-
-## A Combat Move is a custom Data Object part of a Combo's "move list". It holds 
-## the data for defining what kind of effect a move will have in a combo and 
-## various properties for configuration
+class_name CombatAction
 
 enum Processes {Collision, Timing}
 

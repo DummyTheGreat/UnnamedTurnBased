@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Move" load_steps=4 format=3 uid="uid://dsq6syv5penva"]
+
+[ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatAction.gd" id="1_3eb0d"]
+[ext_resource type="Resource" uid="uid://bwlljbscq8vd7" path="res://src/battle_engine/resources/actions/SwordSlash/swordSlash.tres" id="2_2cek8"]
+[ext_resource type="Script" uid="uid://k45vscloe14l" path="res://src/battle_engine/resources/scripts/move.gd" id="2_au6b5"]
+
+[resource]
+script = ExtResource("2_au6b5")
+name = "Double Slash"
+actionList = Array[ExtResource("1_3eb0d")]([ExtResource("2_2cek8"), ExtResource("2_2cek8")])

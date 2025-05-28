@@ -2,14 +2,16 @@
 
 [ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_tlra2"]
 [ext_resource type="Script" uid="uid://br4d4xjg0dp3" path="res://src/battle_engine/resources/scripts/tweenCallback.gd" id="1_uan71"]
-[ext_resource type="Resource" uid="uid://2ij3vwjkx8ob" path="res://src/battle_engine/resources/tweenCallback/SwordSlashReceiverP1C1.tres" id="2_cgyv8"]
+[ext_resource type="Resource" uid="uid://2ij3vwjkx8ob" path="res://src/battle_engine/resources/actions/SwordSlash/SwordSlashReceiverP1C1.tres" id="2_cgyv8"]
 
 [resource]
 script = ExtResource("1_tlra2")
+ID = &"Sword Slash R1"
 property = "position"
 calcKey = 2
 calcArguments = [Vector2(0, -50)]
 duration = 0.5
+delay = 0.0
 transition = 1
 callables = Array[ExtResource("1_uan71")]([ExtResource("2_cgyv8")])
 metadata/_custom_type_script = "uid://1371cmni8esf"

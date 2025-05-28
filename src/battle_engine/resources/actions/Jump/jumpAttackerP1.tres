@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TweenProperty" load_steps=3 format=3 uid="uid://tro1f47toxsm"]
+
+[ext_resource type="Script" uid="uid://br4d4xjg0dp3" path="res://src/battle_engine/resources/scripts/tweenCallback.gd" id="1_0ycuk"]
+[ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="2_kacrg"]
+
+[resource]
+script = ExtResource("2_kacrg")
+ID = &"Jump A1"
+property = "position"
+calcKey = 2
+calcArguments = [Vector2(0, -50)]
+duration = 0.4
+delay = 0.0
+transition = 11
+callables = Array[ExtResource("1_0ycuk")]([])
+metadata/_custom_type_script = "uid://1371cmni8esf"

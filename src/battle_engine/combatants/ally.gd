@@ -22,13 +22,11 @@ func _ready():
 	super._ready()
 
 	self.moves = [
-		load("res://src/battle_engine/resources/moves/sword_slash.tres"),
-		load("res://src/battle_engine/resources/moves/sword_pierce.tres"),
-		load("res://src/battle_engine/resources/moves/dual_shot.tres")
+		load("res://src/battle_engine/resources/moves/AerialSmackdown.tres"),
+		load("res://src/battle_engine/resources/moves/sliceAndSkewer.tres"),
+		load("res://src/battle_engine/resources/moves/CloseInUppercut.tres")
 	]
 	
-	self.comboChains = [
-		load("res://src/battle_engine/resources/combos/swordSlashDouble.tres"),
-		load("res://src/battle_engine/resources/combos/sliceAndSkewer.tres"),
-		load("res://src/battle_engine/resources/combos/CloseInUppercut.tres")
+	self.combos = [
+		load("res://src/battle_engine/resources/combos/UppercutSmackdown.tres")
 	]

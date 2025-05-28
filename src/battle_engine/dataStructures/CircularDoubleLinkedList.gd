@@ -1,4 +1,5 @@
 class_name CircularDoubleLinkedList
+## TODO: Change this to extend LinkedList
 
 ## Internal Class for holding Linked List data
 class ListNode:

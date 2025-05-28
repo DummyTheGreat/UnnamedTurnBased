@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CombatAction" load_steps=4 format=3 uid="uid://ccvvlifj15lqp"]
+
+[ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_00ctp"]
+[ext_resource type="Resource" uid="uid://tro1f47toxsm" path="res://src/battle_engine/resources/actions/Jump/jumpAttackerP1.tres" id="2_ee5w4"]
+[ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatAction.gd" id="3_h5o6g"]
+
+[resource]
+script = ExtResource("3_h5o6g")
+name = "Jump"
+weapon = -1
+damage = 0
+attackVariant = 3
+inputKeyName = &"MoveUp"
+reactionTime = 0.7
+minimumDistanceToTargets = 50
+maxTargets = 1
+damageProcessing = 1
+attackerAnimationEase = 1
+attackerAnimationProperties = Array[ExtResource("1_00ctp")]([ExtResource("2_ee5w4")])
+recieverAnimationEase = 0
+recieverAnimationProperties = Array[ExtResource("1_00ctp")]([])
+metadata/_custom_type_script = "uid://ba5a0kqfel84g"

@@ -14,12 +14,7 @@ func _ready():
 	enemySignal.connect(battle.processEnemyTurn)
 	
 	self.moves = [
-		load("res://src/battle_engine/resources/moves/sword_pierce.tres"),
-		load("res://src/battle_engine/resources/moves/sword_slash.tres")
-	]
-	
-	self.comboChains = [
-		load("res://src/battle_engine/resources/combos/CloseInUppercut.tres")
+		load("res://src/battle_engine/resources/moves/CloseInUppercut.tres")
 	]
 	
 
@@ -27,7 +22,7 @@ func _action():
 	var targets : Array[Combatant] = []
 	targets.append(self._assess_targets(self.owner.allies))
 	# Randomly selects a move for now
-	var move = self.comboChains[randi() % comboChains.size()]
+	var move : Move = self.moves[randi() % moves.size()]
 	enemySignal.emit(self, targets, move)
 	
 	

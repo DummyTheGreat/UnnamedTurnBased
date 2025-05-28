@@ -9,6 +9,7 @@ var calcDict : Dictionary = {
 	Funcs.ShiftRecieverByDistance : ShiftRecieverByDistance
 }
 
+@export var ID : StringName
 @export var property : String
 @export var calcKey : Funcs
 @export var calcArguments : Array
@@ -19,6 +20,7 @@ var calcDict : Dictionary = {
 
 
 func _init(
+	ID : StringName = "",
 	property : String = "position",
 	calcKey : Funcs = Funcs.None,
 	calcArguments : Array = [],
@@ -27,6 +29,7 @@ func _init(
 	transition : Tween.TransitionType = Tween.TRANS_LINEAR,
 	callables : Array[TweenCallback] = []
 	) -> void:
+	self.ID = ID
 	self.property = property
 	self.calcKey = calcKey
 	self.calcArguments = calcArguments

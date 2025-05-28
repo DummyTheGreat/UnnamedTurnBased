@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TweenProperty" load_steps=3 format=3 uid="uid://04ddaukydo"]
+
+[ext_resource type="Script" uid="uid://br4d4xjg0dp3" path="res://src/battle_engine/resources/scripts/tweenCallback.gd" id="1_s2uv2"]
+[ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="2_5brne"]
+
+[resource]
+script = ExtResource("2_5brne")
+ID = &"Smackdown R1"
+property = "position"
+calcKey = 2
+calcArguments = [Vector2(20, 50)]
+duration = 0.3
+delay = 0.0
+transition = 9
+callables = Array[ExtResource("1_s2uv2")]([])
+metadata/_custom_type_script = "uid://1371cmni8esf"

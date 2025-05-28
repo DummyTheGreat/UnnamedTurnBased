@@ -1,13 +1,14 @@
 extends Resource
 class_name Combo
 
-## A Combo is a custom Data Object that holds a list of Combo Move Objects so
-## that they may be linked together to form a combo
-
 @export var name : String
-@export var comboList : Array[CombatMove] ## A list of ComboMoves
+@export var moveList : Array[Move] ## A list of ComboMoves
+@export var propertyDrops : Array[StringName]
 
-
-func _init(nameParam: String = "", comboListParam: Array[CombatMove] = []):
-	name = nameParam
-	comboList = comboListParam
+func _init(
+	name: String = "", 
+	moveList: Array[Move] = [], 
+	propertyDrops : Array[StringName] = []):
+	self.name = name
+	self.moveList = moveList
+	self.propertyDrops = propertyDrops

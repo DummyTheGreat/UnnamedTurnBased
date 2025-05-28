@@ -5,10 +5,12 @@
 
 [resource]
 script = ExtResource("2_ag8rf")
+ID = &"Uppercut A1"
 property = "position"
 calcKey = 1
 calcArguments = [0.8]
 duration = 0.9
+delay = 0.0
 transition = 0
 callables = Array[ExtResource("1_stp80")]([])
 metadata/_custom_type_script = "uid://1371cmni8esf"

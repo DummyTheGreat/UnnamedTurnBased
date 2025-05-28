@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("2_s2mcj")
+ID = &"Dash Towards A1"
 property = "position"
 calcKey = 1
 calcArguments = [0.8]

@@ -12,8 +12,9 @@ class_name ReactionPathFollower
 var inputKeyName : StringName ## The type of attack variant that the requested input should match to
 var bufferTime : float ## The amount of time it takes for this node to fully traverse the path
 var prevFollower : ReactionPathFollower
+var index : int
 
-signal nextReaction()
+#signal nextReaction()
 
 ##*Signal Function*
 ## Emits when the prior reaction follower finishes
@@ -21,13 +22,18 @@ func startTimer():
 	timer.start()
 
 func endFollower():
-	nextReaction.emit()
+	#nextReaction.emit()
 	self.queue_free()
+	
+func getIndex():
+	return self.index
+	
 
-func _init(p_inputKeyName: StringName, p_bufferTime: float, prevFollower : ReactionPathFollower) -> void:
+func _init(p_inputKeyName: StringName, p_bufferTime: float, prevFollower : ReactionPathFollower, index : int) -> void:
 	self.inputKeyName = p_inputKeyName
 	self.bufferTime = p_bufferTime
 	self.prevFollower = prevFollower
+	self.index = index
 
 
 # Called when the node enters the scene tree for the first time.
@@ -59,10 +65,10 @@ func _ready() -> void:
 	self.add_child(label)
 	self.add_child(reactionArea)
 	
-	if prevFollower == null:
-		startTimer()
-	else:
-		prevFollower.nextReaction.connect(self.startTimer)
+	#if prevFollower == null:
+		#startTimer()
+	#else:
+		#prevFollower.nextReaction.connect(self.startTimer)
 	
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.

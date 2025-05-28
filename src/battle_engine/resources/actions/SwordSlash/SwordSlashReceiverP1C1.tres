@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="TweenCallback" load_steps=2 format=3 uid="uid://2ij3vwjkx8ob"]
 
-[ext_resource type="Script" uid="uid://br4d4xjg0dp3" path="res://src/battle_engine/resources/scripts/tweenCallback.gd" id="1_wvx2v"]
+[ext_resource type="Script" uid="uid://br4d4xjg0dp3" path="res://src/battle_engine/resources/scripts/tweenCallback.gd" id="1_xtx18"]
 
 [resource]
-script = ExtResource("1_wvx2v")
+script = ExtResource("1_xtx18")
 callKey = 0
 delay = 0.0
 callableArguments = [4]

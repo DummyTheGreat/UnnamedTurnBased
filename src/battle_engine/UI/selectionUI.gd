@@ -79,7 +79,7 @@ func initMoves(label: Button) -> void:
 		selectionList.add_child(label)
 		
 func initCombos(label: Button) -> void:
-	for combo in self.get_parent().comboChains:
+	for combo in self.get_parent().combos:
 		label = Button.new()
 		label.custom_minimum_size = Vector2(100, 20)
 		label.theme = selectionTheme

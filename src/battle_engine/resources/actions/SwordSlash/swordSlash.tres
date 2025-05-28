@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CombatMove" load_steps=6 format=3 uid="uid://bwlljbscq8vd7"]
+
+[ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_360fl"]
+[ext_resource type="Resource" uid="uid://bdpur8t0rbwdj" path="res://src/battle_engine/resources/actions/SwordSlash/swordSlashAttackerP1.tres" id="2_ue3mo"]
+[ext_resource type="Resource" uid="uid://b007wmflohemn" path="res://src/battle_engine/resources/actions/SwordSlash/swordSlashRecieverP1.tres" id="3_qwww3"]
+[ext_resource type="Resource" uid="uid://dqtumv461m1tq" path="res://src/battle_engine/resources/actions/SwordSlash/swordSlashRecieverP2.tres" id="4_8b7a3"]
+[ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatAction.gd" id="5_1rjef"]
+
+[resource]
+script = ExtResource("5_1rjef")
+name = "Sword Slash"
+weapon = 0
+damage = 4
+attackVariant = 0
+inputKeyName = &"SlashAction"
+reactionTime = 1.0
+minimumDistanceToTargets = 50
+maxTargets = 1
+damageProcessing = 0
+attackerAnimationEase = 1
+attackerAnimationProperties = Array[ExtResource("1_360fl")]([ExtResource("2_ue3mo")])
+recieverAnimationEase = 1
+recieverAnimationProperties = Array[ExtResource("1_360fl")]([ExtResource("3_qwww3"), ExtResource("4_8b7a3")])

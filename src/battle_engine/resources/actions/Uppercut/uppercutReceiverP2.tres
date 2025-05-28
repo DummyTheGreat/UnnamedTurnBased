@@ -5,9 +5,10 @@
 
 [resource]
 script = ExtResource("2_34oxc")
+ID = &"Uppercut R2"
 property = "position"
 calcKey = 2
-calcArguments = [Vector2(0, 0)]
+calcArguments = [Vector2(10, 0)]
 duration = 0.5
 delay = 0.0
 transition = 9
