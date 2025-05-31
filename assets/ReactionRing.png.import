@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bv1mufevi2kc8"
-path="res://.godot/imported/action_bar.png-1ce941431ab98421c0901c54e441b18c.ctex"
+uid="uid://uo73m1bh8jfh"
+path="res://.godot/imported/ReactionRing.png-53331f700d7fe8d1717172a13a207334.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/action_bar.png"
-dest_files=["res://.godot/imported/action_bar.png-1ce941431ab98421c0901c54e441b18c.ctex"]
+source_file="res://assets/ReactionRing.png"
+dest_files=["res://.godot/imported/ReactionRing.png-53331f700d7fe8d1717172a13a207334.ctex"]
 
 [params]
 

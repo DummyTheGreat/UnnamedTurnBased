@@ -42,7 +42,7 @@ var pendingTargetTween : Tween
 var actingCombatantOnLeft : bool = true
 var inputKeyD : InputEventKey
 var inputKeyA : InputEventKey
-var follower : ReactionPathFollower
+var follower : Reactor
 var sizeSummation : int = 0
 
 signal resetBattleCamera() ## Emits to battleCamera -> doCameraReset
@@ -57,6 +57,7 @@ signal updateTurnOrder() ## Emits to turnOrder -> updateList
 signal addTempTurnOrder(character: Combatant, actionValue: int) ## Emits to turnOrder -> addTemp
 signal removeTempTurnOrder() ## Emits to turnOrder -> removeTemp
 signal nextReaction() ## Emits to Combatant -> ...
+signal reactionTriggered(inputAction : StringName) ## Emites to ReactionUI -> handleReaction
 
 
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
@@ -158,15 +159,13 @@ func beginCombatExecutionState(timeSummation: float) -> void:
 
 	actionState = "combatExecution"
 	
-## *Signal Function*
-## Emit recieved from Tween.finished
-func tweenEnds(tween : Tween, tweenOwner : Combatant, followerIndex : int) -> void:
+func nextAction(followerIndex : int):
 	var moveSize = selectedCombo.moveList.size()
 	var actionSize = selectedCombo.moveList[comboIndex].actionList.size()
 
 	moveIndex = followerIndex - sizeSummation
 
-	if moveIndex == actionSize and comboIndex < moveSize - 1:
+	if moveIndex >= actionSize and comboIndex < moveSize - 1:
 		moveIndex = 0
 		sizeSummation += actionSize
 		comboIndex += 1
@@ -174,10 +173,13 @@ func tweenEnds(tween : Tween, tweenOwner : Combatant, followerIndex : int) -> vo
 	if moveIndex < actionSize:
 		currentAction = selectedCombo.moveList[comboIndex].actionList[moveIndex]
 		
+	nextReaction.emit()
+	
+## *Signal Function*
+## Emit recieved from Tween.finished
+func tweenEnds(tween : Tween, tweenOwner : Combatant, followerIndex : int) -> void:
+	nextAction(followerIndex)
 	tween.kill()
-	if followerIndex > tweenCounter:
-		nextReaction.emit()
-	tweenCounter = followerIndex
 		
 ## *Signal Function*
 ## Emit recieved from reactionPath.gd
@@ -236,46 +238,30 @@ func handleCombatantAreaEntered(eneteringArea : Area2D, recievingArea : Area2D):
 			follower.getIndex())
 	
 ## Handles the user input during a quick-time combo string 
-## @param attackVariant - The type of attack executed by the player determined by their input
-## @param skillPointsUsed - The number of skill poitns to remove from the combatant
-func processComboInput(inputKeyName : StringName, skillPointsUsed : int):
+func processComboInput(correctInput : bool, reactionScore : float):
 	
-	var queue = reactionClickArea.get_overlapping_areas()	
-	if len(queue) > 0:
-		follower = queue[0].get_parent()
-		#
-		#var nextMoveDistance : int
-		#if comboIndex + 1 < selectedCombo.comboList.size():
-			#nextMoveDistance = selectedCombo.comboList[comboIndex + 1].minimumDistanceToTargets
-		print("FOLLOWER INPUT KEY", follower.inputKeyName)
-		if (inputKeyName == follower.inputKeyName):
-			var action : CombatAction = currentAction
-			## NOTE: Temporary assignments, will need to be dynamically assigned
-			var attacker = actingCombatant
-			# Reduce skills points from gauge
-			actingCombatant.skill_points -= skillPointsUsed
-
-			for reciever in selectedTargets:
+	if (correctInput):
+		print('yes')
+		var action : CombatAction = currentAction
+		for reciever in selectedTargets:
+			handleMovementTween(
+				actingCombatant, 
+				reciever, 
+				action.attackerAnimationProperties, 
+				action.attackerAnimationEase, 
+				follower.getIndex())
+			# Handled by collision if collision based
+			if action.damageProcessing == action.Processes.Timing:
 				handleMovementTween(
-					attacker, 
 					reciever, 
-					action.attackerAnimationProperties, 
-					action.attackerAnimationEase, 
+					actingCombatant, 
+					action.recieverAnimationProperties, 
+					action.recieverAnimationEase,
 					follower.getIndex())
-				# Handled by collision if collision based
-				if action.damageProcessing == action.Processes.Timing:
-					handleMovementTween(
-						reciever, 
-						attacker, 
-						action.recieverAnimationProperties, 
-						action.recieverAnimationEase,
-						follower.getIndex())
-			
-			# Disable for reaction
-			queue[0].set_collision_layer_value(2, false)
-			queue[0].set_collision_mask_value(2, false)
-		else:
-			print("wrong!")
+	else:
+		print('wrung')
+		nextAction(follower.getIndex())
+		
 			
 func ActionSelectState():
 	## TODO: Change to signal. Only needs to happen once
@@ -395,22 +381,17 @@ func CombatExecutionState():
 		actingCombatantOnLeft = false
 	## TODO: THERE HAS GOT TO BE A BETTER WAY TO DO THIS
 	if Input.is_action_just_pressed("SlashAction"):
-		processComboInput("SlashAction", 2)
-		
+		reactionTriggered.emit("SlashAction")
 	elif Input.is_action_just_pressed("PierceAction"):
-		processComboInput("PierceAction", 4)
-
+		reactionTriggered.emit("PierceAction")
 	elif Input.is_action_just_pressed("StrikeAction"):
-		processComboInput("StrikeAction", 3)
-		
+		reactionTriggered.emit("StrikeAction")
 	elif Input.is_action_just_pressed("MoveTowards"):
-		processComboInput("MoveTowards", 0)
-	
+		reactionTriggered.emit("MoveTowards")
 	elif Input.is_action_just_pressed("MoveAway"):
-		processComboInput("MoveAway", 0)
-
+		reactionTriggered.emit("MoveAway")
 	elif Input.is_action_just_pressed("MoveUp"):
-		processComboInput("MoveUp", 0)
+		reactionTriggered.emit("MoveUp")
 
 func CombatResetState():
 	if get_tree().get_processed_tweens().is_empty():
