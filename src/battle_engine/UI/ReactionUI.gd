@@ -55,7 +55,8 @@ func handleReaction(inputAction : StringName):
 		var score = currentReactor.getDifferenceScore()
 		reactionEval.emit(true, score, currentReactor)
 	else:
-		pass
+		reactionEval.emit(false, 0, currentReactor)
+		
 		# If it is a combo, cancel the move and go the the next move. If it's a move, cancel everything
 
 	
@@ -72,6 +73,13 @@ func startNextReaction():
 	oldReactor.end()
 	if currentReactor != null:
 		currentReactor.startTimer()
+		
+func skipNextReaction() -> Reactor:
+	var oldReactor = currentReactor
+	currentReactor = currentReactor.nextReactor
+	self.remove_child(oldReactor)
+	oldReactor.end()
+	return currentReactor
 
 func _ready() -> void:
 	var battle = self.owner

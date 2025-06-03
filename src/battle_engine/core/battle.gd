@@ -253,6 +253,10 @@ func processComboInput(correctInput : bool, reactionScore : float, fol : Reactor
 					follower.getIndex())
 	else:
 		print('wrung')
+		var actionSize = selectedCombo.moveList[comboIndex].actionList.size()
+		while follower.getIndex() - sizeSummation != actionSize:
+			follower = reactorContainer.skipNextReaction()
+			
 		nextAction(follower.getIndex())
 		
 			
