@@ -106,7 +106,7 @@ func readUIInputData(selectionChoice: String, listChoice: String) -> void:
 	if selectionChoice == "moves":
 		list = actingCombatant.moves
 	elif selectionChoice == "combos":
-		list = actingCombatant.comboChains
+		list = actingCombatant.combos
 	elif selectionChoice == "skills":
 		list = actingCombatant.skills
 		
@@ -148,7 +148,7 @@ func readUIInputData(selectionChoice: String, listChoice: String) -> void:
 	actionState = "targetSelect"
 	
 ## Processes enemy turn. Takes target and move selection from enemysignal
-func processEnemyTurn(enemy : Enemy, targets : Array[Combatant], move : Combo):
+func processEnemyTurn(enemy : Enemy, targets : Array[Combatant], move : Move):
 	print(enemy.name, " attacks ", targets[0].name)
 	selectedCombo = Combo.new("move", [move])
 	comboIndex = 0
