@@ -1,4 +1,4 @@
-extends Control
+extends HBoxContainer
 class_name ReactionUI
 
 const reactorScene = preload("res://src/battle_engine/UI/Reactor.tscn")
@@ -37,7 +37,6 @@ func addFollowers(moveList : Array[Move]) -> void:
 				action.inputKeyName)
 				
 			self.add_child(reactor)
-			
 			if prevReactor != null: # Create a shitty linked list chain
 				prevReactor.nextReactor = reactor
 			prevReactor = reactor
@@ -52,20 +51,25 @@ func addFollowers(moveList : Array[Move]) -> void:
 	
 func handleReaction(inputAction : StringName):
 	if inputAction == currentReactor.inputAction:
+		print('hello')
 		var score = currentReactor.getDifferenceScore()
-		reactionEval.emit(true, score, currentReactor.getIndex())
+		reactionEval.emit(true, score, currentReactor)
 	else:
 		pass
 		# If it is a combo, cancel the move and go the the next move. If it's a move, cancel everything
+
 	
 ## *Signal Function*
 ## Emitted by self when a child is added or lost
 func handleFollowerRemoval() -> void:
-	if self.get_child_count() == 2:
+	if self.get_child_count() == 0:
 		endReactionWindow.emit()
 		
 func startNextReaction():
+	var oldReactor = currentReactor
 	currentReactor = currentReactor.nextReactor
+	self.remove_child(oldReactor)
+	oldReactor.end()
 	if currentReactor != null:
 		currentReactor.startTimer()
 

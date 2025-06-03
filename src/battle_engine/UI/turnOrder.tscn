@@ -2,12 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cgrev8usnthuc" path="res://src/battle_engine/UI/turnOrderUI.gd" id="1_0ebr3"]
 
-[node name="Turn-order" type="Control"]
-layout_mode = 3
-anchors_preset = 0
+[node name="Turn-order" type="VBoxContainer"]
+offset_right = 180.0
+offset_bottom = 240.0
 script = ExtResource("1_0ebr3")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0

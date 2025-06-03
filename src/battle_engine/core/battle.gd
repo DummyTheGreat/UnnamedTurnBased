@@ -6,11 +6,10 @@ extends Node2D
 @onready var field = $Field
 @onready var camera = $BattleCamera
 @onready var cameraFocus = $BattleCamera/CenterFocus
-@onready var reactionPath = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath
-@onready var reactionClickArea = $UILayer/BattleUI/HorizontalContainer/ReactionUI/ReactionPath/ClickArea
-@onready var statUIs = $UILayer/BattleUI/StatUIs
+@onready var reactorContainer : ReactionUI = $UILayer/BattleUI/Reactors
+@onready var statUIs : HBoxContainer = $UILayer/BattleUI/StatUIs
 @onready var targetStats = $UILayer/BattleUI/TargetStats
-@onready var turnOrder = $UILayer/BattleUI/HorizontalContainer
+@onready var battleUI = $UILayer/BattleUI
 
 ## Load shader materials
 @onready var selectShader = preload("res://assets/materials/allySelectedShader.tres")
@@ -156,7 +155,6 @@ func processEnemyTurn(enemy : Enemy, targets : Array[Combatant], move : Move):
 ## *Signal Function*
 ## Emit recieved from reactionPath.gd
 func beginCombatExecutionState(timeSummation: float) -> void:
-
 	actionState = "combatExecution"
 	
 func nextAction(followerIndex : int):
@@ -173,7 +171,9 @@ func nextAction(followerIndex : int):
 	if moveIndex < actionSize:
 		currentAction = selectedCombo.moveList[comboIndex].actionList[moveIndex]
 		
-	nextReaction.emit()
+	if tweenCounter < followerIndex:
+		nextReaction.emit()
+	tweenCounter = followerIndex
 	
 ## *Signal Function*
 ## Emit recieved from Tween.finished
@@ -188,30 +188,25 @@ func endCombatExecutionState() -> void:
 		
 	
 ## Handles movement tweening
-func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProperties : Array[TweenProperty], easeType : Tween.EaseType, followerIndex : int) -> void:
+func handleMovementTween(primary : Combatant, secondary : Combatant, tweenProperties : Array[TweenProperty], followerIndex : int) -> void:
 	if tweenProperties.is_empty():
 		return
 		
 	var tween = get_tree().create_tween()
 	tween.pause()
 	tween.set_parallel(true)
-	tween.set_ease(easeType)
-	
+		
 	for tProp : TweenProperty in tweenProperties:
 		if tProp.ID in selectedCombo.propertyDrops:
 			continue
 		
 		var movementCall : Callable = tProp.calcDict[tProp.calcKey].bindv(tProp.calcArguments)
-		var finalValue
-		if movementCall.get_argument_count() == 2:
-			finalValue = movementCall.call(primary, secondary)
-		else:
-			finalValue = movementCall.call(primary)
+		var finalValue = movementCall.call(primary, secondary)
 		tween.chain().tween_property(
 			primary, 
 			tProp.property, 
 			finalValue,
-			tProp.duration).set_trans(tProp.transition).set_delay(tProp.delay)
+			tProp.duration).set_trans(tProp.transition).set_delay(tProp.delay).set_ease(tProp.ease)
 			
 		for tCall : TweenCallback in tProp.callables:
 			var effectCall : Callable = tCall.callDict[tCall.callKey]
@@ -234,12 +229,12 @@ func handleCombatantAreaEntered(eneteringArea : Area2D, recievingArea : Area2D):
 			reciever, 
 			attacker, 
 			action.recieverAnimationProperties, 
-			action.recieverAnimationEase,
 			follower.getIndex())
 	
+## **RECIEVES SIGNAL from ReactionUI**
 ## Handles the user input during a quick-time combo string 
-func processComboInput(correctInput : bool, reactionScore : float):
-	
+func processComboInput(correctInput : bool, reactionScore : float, fol : Reactor):
+	follower = fol
 	if (correctInput):
 		print('yes')
 		var action : CombatAction = currentAction
@@ -248,7 +243,6 @@ func processComboInput(correctInput : bool, reactionScore : float):
 				actingCombatant, 
 				reciever, 
 				action.attackerAnimationProperties, 
-				action.attackerAnimationEase, 
 				follower.getIndex())
 			# Handled by collision if collision based
 			if action.damageProcessing == action.Processes.Timing:
@@ -256,7 +250,6 @@ func processComboInput(correctInput : bool, reactionScore : float):
 					reciever, 
 					actingCombatant, 
 					action.recieverAnimationProperties, 
-					action.recieverAnimationEase,
 					follower.getIndex())
 	else:
 		print('wrung')
@@ -424,17 +417,16 @@ func _ready():
 	combatants = get_tree().get_nodes_in_group("Combatants")
 	
 	turnOrderNode = turnOrderUI.instantiate()
-	turnOrder.add_child(turnOrderNode)
+	battleUI.add_child(turnOrderNode)
 	turnOrderNode.inputList(combatants)
-	turnOrder.move_child(turnOrderNode, 0)
 	
 	resetBattleCamera.connect(camera.doCameraReset)
-	queueInputsForReaction.connect(reactionPath.addFollowers)
+	queueInputsForReaction.connect(reactorContainer.addFollowers)
 	targetUpdated.connect(cameraFocus.updateTargetPoints)
 	updateTurnOrder.connect(turnOrderNode.updateList)
 	addTempTurnOrder.connect(turnOrderNode.addTemp)
 	removeTempTurnOrder.connect(turnOrderNode.removeTemp)
-	nextReaction.connect(reactionPath.startNextReaction)
+	nextReaction.connect(reactorContainer.startNextReaction)
 	
 	inputKeyD = InputEventKey.new()
 	inputKeyD.keycode = KEY_D
@@ -477,7 +469,6 @@ func _ready():
 	for combatant : Combatant in combatants:
 		actionGaugeAdvance.connect(combatant.actionAdvanceGauge)
 		combatant.set_collision_mask_value(1, false)
-
 					
 			
 func _process(delta):

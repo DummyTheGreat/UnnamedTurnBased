@@ -7,10 +7,11 @@
 script = ExtResource("2_j0vxx")
 ID = &"Smackdown A1"
 property = "position"
-calcKey = 2
-calcArguments = [Vector2(10, 0)]
+calcKey = 1
+calcArguments = [0.8]
 duration = 0.3
 delay = 0.0
 transition = 0
+ease = 1
 callables = Array[ExtResource("1_3u1mf")]([])
 metadata/_custom_type_script = "uid://1371cmni8esf"

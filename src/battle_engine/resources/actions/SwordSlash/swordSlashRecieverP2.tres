@@ -5,10 +5,11 @@
 
 [resource]
 script = ExtResource("1_x1mew")
+ID = &"Sword Slash R2"
 property = "position"
 calcKey = 2
-calcArguments = [Vector2(0, 0)]
-duration = 0.5
+calcArguments = [0, 0]
+duration = 0.2
 delay = 0.0
 transition = 9
 callables = Array[ExtResource("1_5a148")]([])

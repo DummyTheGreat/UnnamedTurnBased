@@ -12,5 +12,6 @@ calcArguments = [0.8]
 duration = 0.6
 delay = 0.0
 transition = 5
+ease = 1
 callables = Array[ExtResource("1_kb0my")]([])
 metadata/_custom_type_script = "uid://1371cmni8esf"

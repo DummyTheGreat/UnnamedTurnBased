@@ -16,9 +16,7 @@ enum ActionVariant {Slash, Pierce, Strike, Move}
 @export var maxTargets : int ## How many targets can be selected
 @export var damageProcessing : Processes
 ## movement animation
-@export var attackerAnimationEase: Tween.EaseType
 @export var attackerAnimationProperties : Array[TweenProperty]
-@export var recieverAnimationEase : Tween.EaseType
 @export var recieverAnimationProperties : Array[TweenProperty]
 
 
@@ -31,9 +29,7 @@ func _init(
 	minimumDistanceToTargets : int = 100,
 	maxTargets : int = 1,
 	damageProcessing : Processes = Processes.Collision,
-	attackerAnimationEase : Tween.EaseType = Tween.EASE_IN,
 	attackAnimationProperties : Array[TweenProperty] = [],
-	recieverAnimationEase : Tween.EaseType = Tween.EASE_IN,
 	recieverAnimationProperties : Array[TweenProperty] = []
 	):
 	self.name = name
@@ -44,8 +40,6 @@ func _init(
 	self.minimumDistanceToTargets = minimumDistanceToTargets
 	self.maxTargets = maxTargets
 	self.damageProcessing = damageProcessing
-	self.attackerAnimationEase = attackerAnimationEase
 	self.attackerAnimationProperties = attackerAnimationProperties
-	self.recieverAnimationEase = recieverAnimationEase
 	self.recieverAnimationProperties = recieverAnimationProperties
 	
