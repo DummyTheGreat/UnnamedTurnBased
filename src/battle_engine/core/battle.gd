@@ -106,19 +106,26 @@ func readUIInputData(selectionChoice: String, listChoice: String) -> void:
 	if selectionChoice == "moves":
 		list = actingCombatant.moves
 	elif selectionChoice == "combos":
-		list = actingCombatant.combos
+		list = actingCombatant.comboChains
+	elif selectionChoice == "skills":
+		list = actingCombatant.skills
 		
 	var choice = list[
 		list.find_custom(
 			func(item): return item.name == listChoice
 		)
 	]
+	
 	if choice is Combo:
 		actionType = "combo"
 		selectedCombo = choice
 	elif choice is Move:
 		actionType = "move"
 		selectedCombo = Combo.new("move", [choice])
+	#elif choice is Skill:
+		#actionType = "skill"
+		
+		
 	
 	## TODO: Temporary, change to dynamic selector based on history (last turn)
 	selected = enemies[0]
@@ -140,8 +147,8 @@ func readUIInputData(selectionChoice: String, listChoice: String) -> void:
 
 	actionState = "targetSelect"
 	
-## Processes enemy turn. Takes target and move selection from enemy signal
-func processEnemyTurn(enemy : Enemy, targets : Array[Combatant], move : Move):
+## Processes enemy turn. Takes target and move selection from enemysignal
+func processEnemyTurn(enemy : Enemy, targets : Array[Combatant], move : Combo):
 	print(enemy.name, " attacks ", targets[0].name)
 	selectedCombo = Combo.new("move", [move])
 	comboIndex = 0
