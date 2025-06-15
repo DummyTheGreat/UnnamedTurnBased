@@ -1,4 +1,5 @@
 extends Control
+class_name SelectionUI
 
 @onready var selectionTheme = preload("res://assets/themes/battleSelectionTheme.tres")
 
@@ -13,7 +14,7 @@ func _ready() -> void:
 	var battleEngine = self.get_parent().get_parent().get_parent().get_parent()
 	
 	# Signal Connections
-	initCombatState.connect(battleEngine.read_ui_input_data)
+	initCombatState.connect(battleEngine.readUIInputData)
 	
 	# Self initialization
 	var textureSize = Vector2(32, 32)
@@ -56,6 +57,7 @@ func _ready() -> void:
 	skillsButton.text = "Skills"
 	skillsButton.theme = selectionTheme
 	skillsButton.position = Vector2(40, 40 + skillsButton.get_minimum_size().y * -0.5)
+	skillsButton.pressed.connect(_moves_button_pressed.bind("skills"))
 	pivotPoint.add_child(skillsButton)
 	
 	selectionList = VBoxContainer.new()
@@ -78,7 +80,7 @@ func initMoves(label: Button) -> void:
 		selectionList.add_child(label)
 		
 func initCombos(label: Button) -> void:
-	for combo in self.get_parent().comboChains:
+	for combo in self.get_parent().combos:
 		label = Button.new()
 		label.custom_minimum_size = Vector2(100, 20)
 		label.theme = selectionTheme
@@ -87,6 +89,15 @@ func initCombos(label: Button) -> void:
 		label.pressed.connect(_list_button_pressed.bind("combos", combo.name))
 		selectionList.add_child(label)
 
+func initSkills(label: Button) -> void:
+	for skill in self.get_parent().skills:
+		label = Button.new()
+		label.custom_minimum_size = Vector2(100, 20)
+		label.theme = selectionTheme
+		label.text = skill.name
+		label.name = skill.name
+		label.pressed.connect(_list_button_pressed.bind("skills", skill.name))
+		selectionList.add_child(label)
 	
 func _moves_button_pressed(selectionChoice: String) -> void:
 	
@@ -97,6 +108,8 @@ func _moves_button_pressed(selectionChoice: String) -> void:
 		initMoves(label)
 	elif selectionChoice == "combos":
 		initCombos(label)
+	elif selectionChoice == "skills":
+		initSkills(label)
 
 	label = Button.new()
 	label.custom_minimum_size = Vector2(100, 20)
