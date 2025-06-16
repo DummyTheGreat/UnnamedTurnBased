@@ -30,3 +30,11 @@ func _ready():
 	self.combos = [
 		load("res://src/battle_engine/resources/combos/UppercutSmackdown.tres")
 	]
+	
+	self.skills = [
+		load("res://src/battle_engine/resources/skills/heal.tres")
+	]
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	move_and_slide()

@@ -48,13 +48,13 @@ func _action():
 	if selectedmove == "combo":
 		## TODO Create combos for enemy (parry system)
 		print("Enemy uses combo!")
-		# var target = self._assess_targets(self.owner.allies)
-		# var combo = comboChains[randi() % comboChains.size()]
-		# enemySignal.emit(self, target, combo)
+		#var target = self._assess_targets(self.owner.allies)
+		#var combo = comboChains[randi() % comboChains.size()]
+		#enemySignal.emit(self, target, combo)
 	
 	if selectedmove == "skill":
 		## TODO Change skill targeting (maybe add a different function)
 		print("Enemy uses skill!")
-		# var target = self._assess_targets(self.owner.allies)
-		# var move = moves[randi() % moves.size()]
-		# enemySignal.emit(self, target, move)
+		var target = self._assess_targets(self.owner.enemies)
+		var skill = skills[randi() % skills.size()]
+		enemySignal.emit(self, target, skill)

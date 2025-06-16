@@ -17,6 +17,10 @@ func _ready():
 		load("res://src/battle_engine/resources/moves/CloseInUppercut.tres")
 	]
 	
+	self.skills = [
+		load("res://src/battle_engine/resources/skills/heal.tres")
+	]
+	
 
 func _action():
 	var targets : Array[Combatant] = []
