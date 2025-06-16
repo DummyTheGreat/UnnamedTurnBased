@@ -43,6 +43,7 @@ var inputKeyD : InputEventKey
 var inputKeyA : InputEventKey
 var follower : Reactor
 var sizeSummation : int = 0
+var inputLock : bool = false
 
 signal resetBattleCamera() ## Emits to battleCamera -> doCameraReset
 signal resetSelectionUI() ## Emits to selectionUI -> resetUI
@@ -170,7 +171,7 @@ func nextAction(followerIndex : int):
 	
 	if moveIndex < actionSize:
 		currentAction = selectedCombo.moveList[comboIndex].actionList[moveIndex]
-		
+	
 	if tweenCounter < followerIndex:
 		nextReaction.emit()
 	tweenCounter = followerIndex
@@ -179,6 +180,7 @@ func nextAction(followerIndex : int):
 ## Emit recieved from Tween.finished
 func tweenEnds(tween : Tween, tweenOwner : Combatant, followerIndex : int) -> void:
 	nextAction(followerIndex)
+	inputLock = false
 	tween.kill()
 		
 ## *Signal Function*
@@ -234,6 +236,9 @@ func handleCombatantAreaEntered(eneteringArea : Area2D, recievingArea : Area2D):
 ## **RECIEVES SIGNAL from ReactionUI**
 ## Handles the user input during a quick-time combo string 
 func processComboInput(correctInput : bool, reactionScore : float, fol : Reactor):
+	if inputLock:
+		return
+	inputLock = true
 	follower = fol
 	if (correctInput):
 		print('yes')
