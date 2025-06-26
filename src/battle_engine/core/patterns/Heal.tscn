@@ -5,13 +5,12 @@
 [ext_resource type="Script" uid="uid://dudfa0ex6k03s" path="res://src/battle_engine/core/patterns/polyBlock.gd" id="3_85yoo"]
 
 [node name="Pattern" type="Control"]
-custom_minimum_size = Vector2(256, 256)
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 3
-anchors_preset = 0
-offset_left = -128.0
-offset_top = -128.0
-offset_right = 128.0
-offset_bottom = 128.0
+offset_left = -64.0
+offset_top = -64.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
 mouse_filter = 1
 script = ExtResource("2_yp0q1")
 
@@ -26,6 +25,8 @@ offset_left = -64.0
 offset_top = -64.0
 offset_right = 64.0
 offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_default_cursor_shape = 2
 texture = ExtResource("2_i70qx")
 expand_mode = 3

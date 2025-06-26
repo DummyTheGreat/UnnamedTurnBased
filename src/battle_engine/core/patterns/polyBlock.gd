@@ -35,6 +35,14 @@ func activateNeighbors(shapeIds : Array[int]):
 	var relevantNeighbors = neighbors.filter(func(num): return (num in selectedShapes))
 	for n in relevantNeighbors:
 		n.fillArea(shapeIds)
+		
+		
+func highlightArea():
+	var poly : Polygon2D = self.get_child(0)
+	var lineFillTween = get_tree().create_tween()
+	lineFillTween.pause()
+	lineFillTween.parallel().tween_property(poly, "color", Color(Color.AZURE, 0.5), 0.1)
+	lineFillTween.play()
 
 ## Fills the PolyBlock with a color using a tween
 func fillArea(shapeIds : Array[int]):

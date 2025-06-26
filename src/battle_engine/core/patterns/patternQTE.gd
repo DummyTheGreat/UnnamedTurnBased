@@ -12,6 +12,7 @@ var isPressed : bool = false
 var affectedShapes : Array[int] = []
 var currentShapeIndex : int = -1
 var paintedBlocks : Array[int] = []
+var grow : bool = false
 
 
 # Remove extruded nodes that are within the triangle formed by the
@@ -20,6 +21,11 @@ var paintedBlocks : Array[int] = []
 # Another idea is convert polylines to a chain of lines or a path 2d and
 # then either compare the point structure against a pattern or generaate a line or curve
 # of best fit for the points of the polyline
+
+
+func startTimer():
+	super()
+	grow = true
 
 ## Useless for now
 func lineSign(pt : Vector2, v1 : Vector2, v2 : Vector2) -> float:
@@ -31,7 +37,9 @@ func lineSign(pt : Vector2, v1 : Vector2, v2 : Vector2) -> float:
 func mouseEntered(shapeIndex : int):
 	currentShapeIndex = shapeIndex
 	if isPressed:
-		affectedShapes.append(shapeIndex)
+		if shapeIndex not in affectedShapes:
+			affectedShapes.append(shapeIndex)
+			area.get_child(shapeIndex).highlightArea()
 	
 ## **SIGNAL FUNCTION**
 ## Emits from a PolyBlock when the tween for changing its color finishes
@@ -44,7 +52,6 @@ func blockFilled(shapeIndex : int, tween : Tween):
 		submitReaction.emit(1)
 		
 	tween.kill()
-	
 	
 func _ready() -> void:
 	super()
@@ -63,6 +70,7 @@ func _input(event: InputEvent) -> void:
 		if event.pressed:
 			if currentShapeIndex >= 0:
 				affectedShapes.append(currentShapeIndex)
+				area.get_child(currentShapeIndex).highlightArea()
 				isPressed = true
 			else:
 				print('cancel')
@@ -79,3 +87,10 @@ func _input(event: InputEvent) -> void:
 	
 	if len(affectedShapes) > 0 and currentShapeIndex == -1:
 		print('kill')
+
+func _process(delta: float) -> void:
+	if grow:
+		self.scale = lerp(self.scale, Vector2(4.0, 4.0), delta * 4)
+		self.offset_left = lerp(self.offset_left, -128.0, delta * 4)
+		self.offset_right = lerp(self.offset_right, -128.0, delta * 4)
+	
