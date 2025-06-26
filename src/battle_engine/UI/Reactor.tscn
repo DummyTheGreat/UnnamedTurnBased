@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://b8wjn7jfwtw4v"]
 
-[ext_resource type="Script" uid="uid://bp3j1a08b8wcj" path="res://src/battle_engine/UI/reactor.gd" id="1_l8mjx"]
+[ext_resource type="Script" uid="uid://bp3j1a08b8wcj" path="res://src/battle_engine/UI/inputPressQTE.gd" id="1_l8mjx"]
 [ext_resource type="Texture2D" uid="uid://6ps0xlx3hty8" path="res://assets/ReactionCircle.png" id="1_mx1gv"]
 [ext_resource type="Texture2D" uid="uid://uo73m1bh8jfh" path="res://assets/ReactionRing.png" id="2_l8mjx"]
 

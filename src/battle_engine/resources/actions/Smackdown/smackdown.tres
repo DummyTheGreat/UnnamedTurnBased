@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CombatMove" load_steps=5 format=3 uid="uid://devm5es43l3k6"]
+[gd_resource type="Resource" script_class="CombatAction" load_steps=5 format=3 uid="uid://devm5es43l3k6"]
 
 [ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_6c14k"]
 [ext_resource type="Resource" uid="uid://d270w5fsaliip" path="res://src/battle_engine/resources/actions/Smackdown/smackdownAttackerP1.tres" id="2_t5ggn"]
@@ -7,17 +7,15 @@
 
 [resource]
 script = ExtResource("4_vjaen")
+attackVariant = 2
+inputKeyName = &"StrikeAction"
 name = ""
 weapon = 1
 damage = 6
-attackVariant = 2
-inputKeyName = &"StrikeAction"
 reactionTime = 1.0
 minimumDistanceToTargets = 50
 maxTargets = 1
 damageProcessing = 1
-attackerAnimationEase = 1
 attackerAnimationProperties = Array[ExtResource("1_6c14k")]([ExtResource("2_t5ggn")])
-recieverAnimationEase = 1
 recieverAnimationProperties = Array[ExtResource("1_6c14k")]([ExtResource("3_6roxl")])
 metadata/_custom_type_script = "uid://ba5a0kqfel84g"

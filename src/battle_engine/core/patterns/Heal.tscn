@@ -1,0 +1,119 @@
+[gd_scene load_steps=4 format=3 uid="uid://c15rw16s36upb"]
+
+[ext_resource type="Texture2D" uid="uid://v4m8uiy27755" path="res://assets/patterns/lesserHealPattern.svg" id="2_i70qx"]
+[ext_resource type="Script" uid="uid://rkx2glxd6l5q" path="res://src/battle_engine/core/patterns/patternQTE.gd" id="2_yp0q1"]
+[ext_resource type="Script" uid="uid://dudfa0ex6k03s" path="res://src/battle_engine/core/patterns/polyBlock.gd" id="3_85yoo"]
+
+[node name="Pattern" type="Control"]
+custom_minimum_size = Vector2(256, 256)
+layout_mode = 3
+anchors_preset = 0
+offset_left = -128.0
+offset_top = -128.0
+offset_right = 128.0
+offset_bottom = 128.0
+mouse_filter = 1
+script = ExtResource("2_yp0q1")
+
+[node name="Template" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -64.0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_default_cursor_shape = 2
+texture = ExtResource("2_i70qx")
+expand_mode = 3
+
+[node name="area" type="Area2D" parent="Template"]
+
+[node name="p0" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(32, 4, 32, 20, 48, 24, 48, 8)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p1")]
+
+[node name="p1" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(32, 20, 32, 36, 48, 40, 48, 24)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p0"), NodePath("../p2"), NodePath("../p6"), NodePath("../p3")]
+
+[node name="p2" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(32, 20, 16, 16, 16, 32, 32, 36)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p1")]
+
+[node name="p3" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(48, 24, 48, 40, 64, 44, 64, 28)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p1"), NodePath("../p4")]
+
+[node name="p4" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(64, 28, 80, 32, 80, 48, 64, 44)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p3"), NodePath("../p5")]
+
+[node name="p5" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(80, 32, 80, 48, 96, 52, 98, 36)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p4"), NodePath("../p13")]
+
+[node name="p6" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(32, 36, 32, 64, 48, 68, 48, 40)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p1"), NodePath("../p7")]
+
+[node name="p7" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(32, 64, 32, 80, 48, 84, 48, 68)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p6"), NodePath("../p8"), NodePath("../p11"), NodePath("../p9")]
+
+[node name="p8" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(32, 64, 16, 60, 16, 76, 32, 80)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p7")]
+
+[node name="p9" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(48, 68, 48, 84, 64, 88, 64, 72)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p7"), NodePath("../p10")]
+
+[node name="p10" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(64, 72, 82, 76, 80, 92, 64, 88)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p9"), NodePath("../p14")]
+
+[node name="p11" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(32, 80, 32, 108, 48, 108, 48, 84)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p7"), NodePath("../p12")]
+
+[node name="p12" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(12, 108, 12, 124, 48, 124, 48, 108)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p11")]
+
+[node name="p13" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(98, 36, 96, 52, 112, 56, 116, 40)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p5")]
+
+[node name="p14" type="CollisionPolygon2D" parent="Template/area" node_paths=PackedStringArray("neighbors")]
+polygon = PackedVector2Array(82, 76, 100, 80, 96, 96, 80, 92)
+script = ExtResource("3_85yoo")
+neighbors = [NodePath("../p10")]
+
+[node name="background" type="ColorRect" parent="Template"]
+show_behind_parent = true
+layout_mode = 1
+offset_right = 128.0
+offset_bottom = 128.0
+mouse_filter = 1
+color = Color(0.29219, 0.29219, 0.29219, 1)
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true

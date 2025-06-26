@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Move" load_steps=5 format=3 uid="uid://bylaih7woogp0"]
 
-[ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatAction.gd" id="1_e2gd1"]
+[ext_resource type="Script" uid="uid://bva7hya04n4v2" path="res://src/battle_engine/resources/scripts/action.gd" id="1_gpvma"]
 [ext_resource type="Resource" uid="uid://eretwbfuvkhr" path="res://src/battle_engine/resources/actions/DashTowards/dashTowards.tres" id="2_gpvma"]
 [ext_resource type="Script" uid="uid://k45vscloe14l" path="res://src/battle_engine/resources/scripts/move.gd" id="2_iebfa"]
 [ext_resource type="Resource" uid="uid://yualuoiqvpkd" path="res://src/battle_engine/resources/actions/Uppercut/uppercut.tres" id="3_4six3"]
@@ -8,5 +8,5 @@
 [resource]
 script = ExtResource("2_iebfa")
 name = "Close In Uppercut"
-actionList = Array[ExtResource("1_e2gd1")]([ExtResource("2_gpvma"), ExtResource("3_4six3")])
+actionList = Array[ExtResource("1_gpvma")]([ExtResource("2_gpvma"), ExtResource("3_4six3")])
 metadata/_custom_type_script = "uid://k45vscloe14l"

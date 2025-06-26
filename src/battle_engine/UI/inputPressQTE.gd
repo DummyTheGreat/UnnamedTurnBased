@@ -1,26 +1,19 @@
-extends Control
-class_name Reactor
+extends QTE
+class_name InputPressQTE
 
 @onready var circle : TextureRect = $ReactionCircle
 @onready var ring : TextureRect = $ReactionRing
 @onready var inputKeyLabel : Label = $ReactionCircle/InputKeyLabel
-@onready var timer : Timer = $Timer
 
-var isActive : bool
-var index : int
-var reactionTime : float
 var inputAction : String
 var shrinkFadeInTween : Tween
-var nextReactor : Reactor
-
 var startingDiff : int
 
 ##*Signal Function*
 ## Emits when the prior reaction follower finishes
 func startTimer():
+	super()
 	shrinkFadeInTween.play()
-	timer.start()
-
 	self.custom_minimum_size = Vector2(256, 256)
 	self.modulate.a = 1.0
 	circle.set_anchor_and_offset(SIDE_LEFT, 0.5, -64)
@@ -28,13 +21,10 @@ func startTimer():
 	circle.set_anchor_and_offset(SIDE_RIGHT, 0.5, 64)
 	circle.set_anchor_and_offset(SIDE_BOTTOM, 0.5, 64)
 	
-func getIndex():
-	return self.index
-	
 func end():
 	shrinkFadeInTween.stop()
 	shrinkFadeInTween.kill()
-	self.queue_free()
+	super()
 	
 func getDifferenceScore():
 	var circleRadius : float = circle.size.x * 0.5
@@ -42,6 +32,7 @@ func getDifferenceScore():
 	return 1 - ((ringRadius - circleRadius) / startingDiff)
 	
 func _ready() -> void:
+	super()
 	
 	startingDiff = ring.size.x * 0.5 - circle.size.x * 0.5
 	
@@ -56,9 +47,7 @@ func _ready() -> void:
 	shrinkFadeInTween.tween_property(ring, "offset_bottom", circle.offset_bottom, reactionTime)
 	
 	inputKeyLabel.text = inputAction
-	
-	timer.wait_time = reactionTime + (reactionTime * 0.05)
-	
+		
 	if not isActive:
 		self.custom_minimum_size = Vector2(64, 256)
 		self.modulate.a = 0.5
@@ -66,7 +55,19 @@ func _ready() -> void:
 		circle.set_anchor_and_offset(SIDE_TOP, 0.5, -32)
 		circle.set_anchor_and_offset(SIDE_RIGHT, 0.5, 32)
 		circle.set_anchor_and_offset(SIDE_BOTTOM, 0.5, 32)
-
-
-func _process(delta: float) -> void:
-	pass
+		
+func _input(event: InputEvent) -> void:
+	if isActive:
+		## TODO: THERE HAS GOT TO BE A BETTER WAY TO DO THIS
+		if Input.is_action_just_pressed("SlashAction"):
+			submitReaction.emit("SlashAction")
+		elif Input.is_action_just_pressed("PierceAction"):
+			submitReaction.emit("PierceAction")
+		elif Input.is_action_just_pressed("StrikeAction"):
+			submitReaction.emit("StrikeAction")
+		elif Input.is_action_just_pressed("MoveTowards"):
+			submitReaction.emit("MoveTowards")
+		elif Input.is_action_just_pressed("MoveAway"):
+			submitReaction.emit("MoveAway")
+		elif Input.is_action_just_pressed("MoveUp"):
+			submitReaction.emit("MoveUp")

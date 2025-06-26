@@ -1,10 +1,10 @@
 extends Resource
 class_name TweenCallback
 
-enum Funcs {ReduceHealth, Sticky}
+enum Funcs {ChangeHealth, Sticky}
 
 var callDict : Dictionary = {
-	Funcs.ReduceHealth : reduceHealth,
+	Funcs.ChangeHealth : changeHealth,
 	Funcs.Sticky : sticky
 }
 
@@ -13,7 +13,7 @@ var callDict : Dictionary = {
 @export var callableArguments : Array
 
 func _init(
-	callKey : Funcs = Funcs.ReduceHealth, 
+	callKey : Funcs = Funcs.ChangeHealth, 
 	delay : float = 0, 
 	callableArguments : Array = []) -> void:
 	self.callKey = callKey
@@ -21,8 +21,8 @@ func _init(
 	self.callableArguments = callableArguments
 	
 
-func reduceHealth(primary : Combatant, secondary : Combatant, damage: int):
-	primary.current_health -= damage
+func changeHealth(primary : Combatant, secondary : Combatant, value: int):
+	primary.current_health += value
 	
 	
 func sticky(primary : Combatant, secondary : Combatant, offset : int):

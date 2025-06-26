@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Move" load_steps=4 format=3 uid="uid://bc1ouub328l8i"]
+
+[ext_resource type="Script" uid="uid://bva7hya04n4v2" path="res://src/battle_engine/resources/scripts/action.gd" id="1_5l28g"]
+[ext_resource type="Resource" uid="uid://d2nohl65psyym" path="res://src/battle_engine/resources/skills/LesserHeal/lesserHeal.tres" id="2_hgemf"]
+[ext_resource type="Script" uid="uid://k45vscloe14l" path="res://src/battle_engine/resources/scripts/move.gd" id="2_po065"]
+
+[resource]
+script = ExtResource("2_po065")
+name = "Lesser Heal"
+actionList = Array[ExtResource("1_5l28g")]([ExtResource("2_hgemf")])
+metadata/_custom_type_script = "uid://k45vscloe14l"

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TweenProperty" load_steps=4 format=3 uid="uid://d38ynjyj7bqnq"]
+
+[ext_resource type="Script" uid="uid://br4d4xjg0dp3" path="res://src/battle_engine/resources/scripts/tweenCallback.gd" id="1_ocqa1"]
+[ext_resource type="Resource" uid="uid://b8j2qmvevfyjj" path="res://src/battle_engine/resources/skills/LesserHeal/lesserHealActorP1C1.tres" id="2_7aj6j"]
+[ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="2_gkats"]
+
+[resource]
+script = ExtResource("2_gkats")
+ID = &"Lesser Heal A1"
+property = "position"
+calcKey = 0
+calcArguments = []
+duration = 0.0
+delay = 0.0
+transition = 0
+ease = 0
+callables = Array[ExtResource("1_ocqa1")]([ExtResource("2_7aj6j")])
+metadata/_custom_type_script = "uid://1371cmni8esf"

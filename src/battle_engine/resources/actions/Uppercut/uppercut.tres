@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CombatMove" load_steps=5 format=3 uid="uid://yualuoiqvpkd"]
+[gd_resource type="Resource" script_class="CombatAction" load_steps=5 format=3 uid="uid://yualuoiqvpkd"]
 
 [ext_resource type="Script" uid="uid://1371cmni8esf" path="res://src/battle_engine/resources/scripts/tweenProperty.gd" id="1_vt3t5"]
 [ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatAction.gd" id="2_r5e2h"]
@@ -7,17 +7,15 @@
 
 [resource]
 script = ExtResource("2_r5e2h")
+attackVariant = 2
+inputKeyName = &"StrikeAction"
 name = "Uppercut"
 weapon = 1
 damage = 3
-attackVariant = 2
-inputKeyName = &"StrikeAction"
 reactionTime = 0.9
 minimumDistanceToTargets = 50
 maxTargets = 1
 damageProcessing = 1
-attackerAnimationEase = 0
 attackerAnimationProperties = Array[ExtResource("1_vt3t5")]([])
-recieverAnimationEase = 1
 recieverAnimationProperties = Array[ExtResource("1_vt3t5")]([ExtResource("3_opevs"), ExtResource("3_r6ljw")])
 metadata/_custom_type_script = "uid://ba5a0kqfel84g"

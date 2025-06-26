@@ -18,7 +18,7 @@ func _ready():
 	]
 	
 	self.skills = [
-		load("res://src/battle_engine/resources/skills/heal.tres")
+		load("res://src/battle_engine/resources/moves/LesserHeal.tres")
 	]
 	
 

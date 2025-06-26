@@ -76,8 +76,6 @@ script = ExtResource("4_6ek73")
 
 [node name="TestAlly1" type="CharacterBody2D" parent="Field/Allies" groups=["Allies", "Combatants"]]
 script = ExtResource("2_miag1")
-speed = 12
-characterName = "AllyOne"
 
 [node name="Sprite2D" type="Sprite2D" parent="Field/Allies/TestAlly1"]
 texture = ExtResource("2_etjw6")
@@ -87,8 +85,6 @@ shape = SubResource("RectangleShape2D_qxmty")
 
 [node name="TestAlly2" type="CharacterBody2D" parent="Field/Allies" groups=["Allies", "Combatants"]]
 script = ExtResource("2_miag1")
-speed = 8
-characterName = "AllyTwo"
 
 [node name="Sprite2D" type="Sprite2D" parent="Field/Allies/TestAlly2"]
 texture = ExtResource("2_etjw6")
@@ -98,7 +94,6 @@ shape = SubResource("RectangleShape2D_qxmty")
 
 [node name="TestAlly3" type="CharacterBody2D" parent="Field/Allies" groups=["Allies", "Combatants"]]
 script = ExtResource("2_miag1")
-characterName = "AllyThree"
 
 [node name="Sprite2D" type="Sprite2D" parent="Field/Allies/TestAlly3"]
 texture = ExtResource("2_etjw6")
@@ -110,8 +105,6 @@ shape = SubResource("RectangleShape2D_qxmty")
 
 [node name="TestEnemy1" type="CharacterBody2D" parent="Field/Enemies" groups=["Combatants", "Enemies"]]
 script = ExtResource("8_fkwuy")
-speed = 12
-characterName = "EnemyOne"
 
 [node name="Sprite2D" type="Sprite2D" parent="Field/Enemies/TestEnemy1"]
 texture = ExtResource("3_ktxq8")
@@ -121,7 +114,6 @@ shape = SubResource("RectangleShape2D_qxmty")
 
 [node name="TestEnemy2" type="CharacterBody2D" parent="Field/Enemies" groups=["Combatants", "Enemies"]]
 script = ExtResource("4_7bqa5")
-characterName = "EnemyTwo"
 
 [node name="Sprite2D" type="Sprite2D" parent="Field/Enemies/TestEnemy2"]
 texture = ExtResource("3_ktxq8")

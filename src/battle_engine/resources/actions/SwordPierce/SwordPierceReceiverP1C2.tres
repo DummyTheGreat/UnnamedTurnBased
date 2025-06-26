@@ -6,5 +6,5 @@
 script = ExtResource("1_81tt6")
 callKey = 0
 delay = 0.0
-callableArguments = [4]
+callableArguments = [-4]
 metadata/_custom_type_script = "uid://br4d4xjg0dp3"

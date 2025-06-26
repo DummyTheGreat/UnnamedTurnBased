@@ -5,9 +5,9 @@ class_name Move
 ## that they may be linked together to form a move
 
 @export var name : String
-@export var actionList : Array[CombatAction] ## A list of ComboMoves
+@export var actionList : Array[Action] ## A list of ComboMoves
 
 
-func _init(name: String = "", actionList: Array[CombatAction] = []):
+func _init(name: String = "", actionList: Array[Action] = []):
 	self.name = name
 	self.actionList = actionList

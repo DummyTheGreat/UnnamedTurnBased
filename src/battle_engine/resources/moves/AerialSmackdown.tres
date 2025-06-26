@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Move" load_steps=5 format=3 uid="uid://bxuwbgamc22m8"]
 
-[ext_resource type="Script" uid="uid://ba5a0kqfel84g" path="res://src/battle_engine/resources/scripts/combatAction.gd" id="1_rcg2m"]
+[ext_resource type="Script" uid="uid://bva7hya04n4v2" path="res://src/battle_engine/resources/scripts/action.gd" id="1_ijgsh"]
 [ext_resource type="Script" uid="uid://k45vscloe14l" path="res://src/battle_engine/resources/scripts/move.gd" id="2_7ploy"]
 [ext_resource type="Resource" uid="uid://ccvvlifj15lqp" path="res://src/battle_engine/resources/actions/Jump/jump.tres" id="2_ijgsh"]
 [ext_resource type="Resource" uid="uid://devm5es43l3k6" path="res://src/battle_engine/resources/actions/Smackdown/smackdown.tres" id="3_g3483"]
@@ -8,5 +8,5 @@
 [resource]
 script = ExtResource("2_7ploy")
 name = "Aearial Smackdown"
-actionList = Array[ExtResource("1_rcg2m")]([ExtResource("2_ijgsh"), ExtResource("3_g3483")])
+actionList = Array[ExtResource("1_ijgsh")]([ExtResource("2_ijgsh"), ExtResource("3_g3483")])
 metadata/_custom_type_script = "uid://k45vscloe14l"
