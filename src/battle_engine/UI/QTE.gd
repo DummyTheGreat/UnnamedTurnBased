@@ -12,6 +12,7 @@ var reactionTime : float
 
 func startTimer():
 	timer.start()
+	isActive = true
 	
 func getIndex():
 	return self.index

@@ -72,7 +72,6 @@ func addFollowers(moveList : Array[Move]) -> void:
 	
 func handlePressReaction(inputAction : StringName):
 	if inputAction == currentQTE.inputAction:
-		print('hello')
 		var score = currentQTE.getDifferenceScore()
 		reactionEval.emit(true, score, currentQTE)
 	else:
