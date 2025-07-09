@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SequenceItem" load_steps=2 format=3 uid="uid://dlcs03rxaecgh"]
+
+[ext_resource type="Script" uid="uid://b5g3tq7eqvv33" path="res://src/battle_engine/resources/scripts/sequenceItem.gd" id="1_ble73"]
+
+[resource]
+script = ExtResource("1_ble73")
+item = []
+nextBufferTime = 0.0
+metadata/_custom_type_script = "uid://b5g3tq7eqvv33"

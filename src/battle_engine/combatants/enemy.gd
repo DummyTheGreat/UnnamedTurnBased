@@ -2,6 +2,7 @@ class_name Enemy
 extends Combatant
 
 @onready var battle = self.get_parent().get_parent().get_parent()
+@export var sequences: Array[Sequence] = []
 
 # Signals to get move and target from enemy
 signal enemySignal(enemy : Enemy, targets : Array[Combatant], move : Combo)

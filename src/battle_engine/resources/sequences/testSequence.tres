@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="Sequence" load_steps=8 format=3 uid="uid://cvyykdokqfoj"]
+
+[ext_resource type="Script" uid="uid://b5g13r22302rw" path="res://src/battle_engine/resources/scripts/sequence.gd" id="1_56pmh"]
+[ext_resource type="Script" uid="uid://b5g3tq7eqvv33" path="res://src/battle_engine/resources/scripts/sequenceItem.gd" id="1_nb22t"]
+[ext_resource type="Script" uid="uid://g6xu4ccli74d" path="res://src/battle_engine/resources/scripts/projectileProperties.gd" id="2_nu1u7"]
+[ext_resource type="Texture2D" uid="uid://6ps0xlx3hty8" path="res://assets/ReactionCircle.png" id="3_nu1u7"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kcp8q"]
+radius = 8.0
+
+[sub_resource type="Resource" id="Resource_kcp8q"]
+script = ExtResource("2_nu1u7")
+name = &"Pellet"
+posKey = 0
+posArguments = [0.5, 0.0]
+speed = 400
+dirKey = 1
+dirArguments = []
+shape = SubResource("CircleShape2D_kcp8q")
+spriteTexture = ExtResource("3_nu1u7")
+metadata/_custom_type_script = "uid://g6xu4ccli74d"
+
+[sub_resource type="Resource" id="Resource_8kx3k"]
+script = ExtResource("1_nb22t")
+data = [SubResource("Resource_kcp8q")]
+nextBufferTime = 0.0
+metadata/_custom_type_script = "uid://b5g3tq7eqvv33"
+
+[resource]
+script = ExtResource("1_56pmh")
+name = &"Test"
+chain = Array[ExtResource("1_nb22t")]([SubResource("Resource_8kx3k")])
+type = 0
+enemyName = &"Duck"
+duration = 8.0
+metadata/_custom_type_script = "uid://b5g13r22302rw"

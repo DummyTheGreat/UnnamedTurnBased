@@ -10,6 +10,7 @@ extends Node2D
 @onready var statUIs : HBoxContainer = $UILayer/BattleUI/StatUIs
 @onready var targetStats = $UILayer/BattleUI/TargetStats
 @onready var battleUI = $UILayer/BattleUI
+@onready var miniLayer = $MiniLayer
 
 ## Load shader materials
 @onready var selectShader = preload("res://assets/materials/allySelectedShader.tres")
@@ -18,6 +19,7 @@ extends Node2D
 @onready var selectionUI = preload("res://src/battle_engine/UI/SelectionUI.tscn")
 @onready var characterStatusUI = preload("res://src/battle_engine/UI/CharacterStatusUI.tscn")
 @onready var turnOrderUI = preload("res://src/battle_engine/UI/turnOrder.tscn")
+@onready var miniBattleScene = preload("res://src/battle_engine/core/miniBattle/miniBattle.tscn")
 
 var combatants : Array[Node] ## List of all combatants
 var actingCombatant : Combatant = null ## The ally combatant that the player is currently in control of
@@ -42,6 +44,7 @@ var inputKeyA : InputEventKey
 var follower : QTE
 var sizeSummation : int = 0
 var inputLock : bool = false ## Lock player input until the next reaction is available (for timing reactions)
+var miniBattle : MiniBattle = null
 
 signal resetBattleCamera() ## Emits to battleCamera -> doCameraReset
 signal resetSelectionUI() ## Emits to selectionUI -> resetUI
@@ -55,7 +58,6 @@ signal updateTurnOrder() ## Emits to turnOrder -> updateList
 signal addTempTurnOrder(character: Combatant, actionValue: int) ## Emits to turnOrder -> addTemp
 signal removeTempTurnOrder() ## Emits to turnOrder -> removeTemp
 signal nextReaction() ## Emits to Combatant -> ...
-																																																																																																																																																																																																																																																				#signal reactionTriggered(inputAction : StringName) ## Emites to ReactionUI -> handleReaction
 
 
 ## Custom lambda sorting function used to sort TurnOrder Objects by their speed fields
@@ -156,7 +158,8 @@ func processEnemyTurn(enemy : Enemy, targets : Array[Combatant], move : Move):
 	currentAction = selectedCombo.moveList[comboIndex].actionList[moveIndex]
 	selectedTargets = targets
 	#_process_damage(targets[0], move.comboList[0].damage)
-	prepareCombat()
+	#prepareCombat()
+	actionState = "StartMiniBattle"
 
 
 ## *Signal Function*
@@ -385,19 +388,7 @@ func CombatStartState():
 func CombatExecutionState():
 	## TODO: I really don't want this to run constantly so it needs to move eventually
 	switchInputDirection()
-	### TODO: THERE HAS GOT TO BE A BETTER WAY TO DO THIS
-	#if Input.is_action_just_pressed("SlashAction"):
-		#reactionTriggered.emit("SlashAction")
-	#elif Input.is_action_just_pressed("PierceAction"):
-		#reactionTriggered.emit("PierceAction")
-	#elif Input.is_action_just_pressed("StrikeAction"):
-		#reactionTriggered.emit("StrikeAction")
-	#elif Input.is_action_just_pressed("MoveTowards"):
-		#reactionTriggered.emit("MoveTowards")
-	#elif Input.is_action_just_pressed("MoveAway"):
-		#reactionTriggered.emit("MoveAway")
-	#elif Input.is_action_just_pressed("MoveUp"):
-		#reactionTriggered.emit("MoveUp")
+	
 
 func CombatResetState():
 	if get_tree().get_processed_tweens().is_empty():
@@ -423,6 +414,27 @@ func CombatResetState():
 		actionState = ""
 		removeTempTurnOrder.emit()
 		sizeSummation = 0
+
+func StartMiniBattleState() -> void:
+	miniLayer.add_child(miniBattle)
+	## TODO: CHANGE DECISION AI TO SELECT A SEQUENCE 
+	miniBattle.battleSequences.append(actingCombatant.sequences[0])
+	## TODO: Multiple enemies should act at once, duration is maximum of all
+	#miniBattle.duration = max(actingCombatants.selectedSequence.duration)
+	miniBattle.duration.wait_time = actingCombatant.sequences[0].duration
+	miniBattle.duration.timeout.connect(endMiniBattle)
+	miniBattle.start()
+	actionState = "PlayMiniBattle"
+	
+
+func PlayMiniBattleState() -> void:
+	pass
+	
+func endMiniBattle() -> void:
+	## TODO: Reset mini battle shit
+	miniLayer.remove_child(miniBattle)
+	actionState = "combatReset"
+
 
 func _ready():
 	
@@ -481,8 +493,10 @@ func _ready():
 	for combatant : Combatant in combatants:
 		actionGaugeAdvance.connect(combatant.actionAdvanceGauge)
 		combatant.set_collision_mask_value(1, false)
-					
-			
+		
+	miniBattle = miniBattleScene.instantiate()
+	
+	
 func _process(delta):
 	
 	if playerAction:
@@ -495,8 +509,8 @@ func _process(delta):
 	elif enemyAction:
 		match actionState:
 			"AISelect": ActionSelectState()
-			"combatStart": CombatStartState()
-			"combatExecution": CombatExecutionState()
+			"StartMiniBattle" : StartMiniBattleState()
+			"PlayMiniBattle" : PlayMiniBattleState()
 			"combatReset": CombatResetState()
 	else:
 		actionGaugeAdvance.emit()

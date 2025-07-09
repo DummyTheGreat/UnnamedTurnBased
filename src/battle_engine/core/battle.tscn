@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bhnyyu8t00bk5"]
+[gd_scene load_steps=14 format=3 uid="uid://bhnyyu8t00bk5"]
 
 [ext_resource type="Script" uid="uid://3nfwogn7wtpw" path="res://src/battle_engine/core/battle.gd" id="1_cdclp"]
 [ext_resource type="Texture2D" uid="uid://bb4jynn5qf43f" path="res://assets/player.png" id="2_etjw6"]
@@ -10,6 +10,8 @@
 [ext_resource type="Script" uid="uid://bkl7g6d8pi8dr" path="res://src/battle_engine/core/cameraFocus.gd" id="4_x5rsb"]
 [ext_resource type="Script" uid="uid://dc2yv7280xtxg" path="res://src/battle_engine/core/battleCamera.gd" id="6_qwkl0"]
 [ext_resource type="Script" uid="uid://bibyrgdqbv8w5" path="res://src/battle_engine/combatants/enemySimple.gd" id="8_fkwuy"]
+[ext_resource type="Script" uid="uid://b5g13r22302rw" path="res://src/battle_engine/resources/scripts/sequence.gd" id="9_cuqy4"]
+[ext_resource type="Resource" uid="uid://cvyykdokqfoj" path="res://src/battle_engine/resources/sequences/testSequence.tres" id="10_n2ms4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qxmty"]
 size = Vector2(24, 24)
@@ -76,6 +78,7 @@ script = ExtResource("4_6ek73")
 
 [node name="TestAlly1" type="CharacterBody2D" parent="Field/Allies" groups=["Allies", "Combatants"]]
 script = ExtResource("2_miag1")
+speed = 13
 
 [node name="Sprite2D" type="Sprite2D" parent="Field/Allies/TestAlly1"]
 texture = ExtResource("2_etjw6")
@@ -94,6 +97,7 @@ shape = SubResource("RectangleShape2D_qxmty")
 
 [node name="TestAlly3" type="CharacterBody2D" parent="Field/Allies" groups=["Allies", "Combatants"]]
 script = ExtResource("2_miag1")
+speed = 12
 
 [node name="Sprite2D" type="Sprite2D" parent="Field/Allies/TestAlly3"]
 texture = ExtResource("2_etjw6")
@@ -105,6 +109,8 @@ shape = SubResource("RectangleShape2D_qxmty")
 
 [node name="TestEnemy1" type="CharacterBody2D" parent="Field/Enemies" groups=["Combatants", "Enemies"]]
 script = ExtResource("8_fkwuy")
+sequences = Array[ExtResource("9_cuqy4")]([ExtResource("10_n2ms4")])
+speed = 20
 
 [node name="Sprite2D" type="Sprite2D" parent="Field/Enemies/TestEnemy1"]
 texture = ExtResource("3_ktxq8")
@@ -114,9 +120,13 @@ shape = SubResource("RectangleShape2D_qxmty")
 
 [node name="TestEnemy2" type="CharacterBody2D" parent="Field/Enemies" groups=["Combatants", "Enemies"]]
 script = ExtResource("4_7bqa5")
+speed = 12
 
 [node name="Sprite2D" type="Sprite2D" parent="Field/Enemies/TestEnemy2"]
 texture = ExtResource("3_ktxq8")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Field/Enemies/TestEnemy2"]
 shape = SubResource("RectangleShape2D_qxmty")
+
+[node name="MiniLayer" type="CanvasLayer" parent="."]
+layer = 2

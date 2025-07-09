@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://c1a87jr4qy4ap"]
+
+[ext_resource type="Script" uid="uid://buhjxrx6n60d0" path="res://src/battle_engine/core/miniBattle/miniEnemy.gd" id="1_w1ji2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vxokw"]
+
+[node name="MiniEnemy" type="CharacterBody2D"]
+script = ExtResource("1_w1ji2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_vxokw")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
