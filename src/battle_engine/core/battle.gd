@@ -4,13 +4,12 @@ extends Node2D
 @onready var allies = $Field/Allies.get_children()
 @onready var enemies = $Field/Enemies.get_children()
 @onready var field = $Field
-@onready var camera = $BattleCamera
-@onready var cameraFocus = $BattleCamera/CenterFocus
+@onready var camera : Camera2D = $Field/BattleCamera
+@onready var cameraFocus = $Field/BattleCamera/CenterFocus
 @onready var reactorContainer : ReactionUI = $UILayer/BattleUI/Reactors
 @onready var statUIs : HBoxContainer = $UILayer/BattleUI/StatUIs
 @onready var targetStats = $UILayer/BattleUI/TargetStats
 @onready var battleUI = $UILayer/BattleUI
-@onready var miniLayer = $MiniLayer
 
 ## Load shader materials
 @onready var selectShader = preload("res://assets/materials/allySelectedShader.tres")
@@ -416,13 +415,8 @@ func CombatResetState():
 		sizeSummation = 0
 
 func StartMiniBattleState() -> void:
-	miniLayer.add_child(miniBattle)
-	## TODO: CHANGE DECISION AI TO SELECT A SEQUENCE 
-	miniBattle.battleSequences.append(actingCombatant.sequences[0])
-	## TODO: Multiple enemies should act at once, duration is maximum of all
-	#miniBattle.duration = max(actingCombatants.selectedSequence.duration)
-	miniBattle.duration.wait_time = actingCombatant.sequences[0].duration
-	miniBattle.duration.timeout.connect(endMiniBattle)
+	self.add_child(miniBattle)
+	miniBattle.initialize(actingCombatant.sequences[0], endMiniBattle)
 	miniBattle.start()
 	actionState = "PlayMiniBattle"
 	
@@ -432,7 +426,8 @@ func PlayMiniBattleState() -> void:
 	
 func endMiniBattle() -> void:
 	## TODO: Reset mini battle shit
-	miniLayer.remove_child(miniBattle)
+	self.remove_child(miniBattle)
+	camera.make_current()
 	actionState = "combatReset"
 
 

@@ -9,6 +9,7 @@ var arenaSize : Vector2
 
 const projScene = preload("res://src/battle_engine/core/miniBattle/ProjectileScene.tscn")
 const aoeScene = preload("res://src/battle_engine/core/miniBattle/AOE.tscn")
+const enemyScene = preload("res://src/battle_engine/core/miniBattle/miniEnemy.tscn")
 
 static func initProjectile(
 	spd : int, 
@@ -41,6 +42,20 @@ static func initAOE(
 	newAOE.shape = shape
 	newAOE.texture = texture
 	return newAOE
+	
+static func initEnemy(
+	pos : Vector2,
+	ai : Script,
+	shape : Shape2D,
+	texture : Texture2D,
+	playerTarget : MiniPlayer):
+	var newEnemy = enemyScene.instantiate()
+	newEnemy.set_script(ai)
+	newEnemy.position = pos
+	newEnemy.shape = shape
+	newEnemy.texture = texture
+	newEnemy.playerTarget = playerTarget
+	return newEnemy
 	
 	
 func play():
@@ -79,4 +94,7 @@ func _ready() -> void:
 			elif entity is AOEProperties:
 				sceneEntity = initAOE(startPos, entity.warningTime, entity.effectTime,
 					entity.animationList, entity.shape, entity.spriteTexture)
+			elif entity is MiniEnemyProperties:
+				sceneEntity = initEnemy(startPos, entity.AIScript, entity.shape, 
+					entity.spriteTexture, player)
 			add_child(sceneEntity)

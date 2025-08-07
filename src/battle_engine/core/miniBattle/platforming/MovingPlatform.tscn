@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://bjgwf50a3oufy"]
+
+[ext_resource type="Script" uid="uid://dku1gi7nodeg6" path="res://src/battle_engine/core/miniBattle/platforming/movingPlatform.gd" id="1_6j6f3"]
+[ext_resource type="TileSet" uid="uid://csphh2nci23qk" path="res://src/battle_engine/core/miniBattle/platforming/layouts/BaseTileMap.tres" id="3_0aju4"]
+
+[sub_resource type="Curve2D" id="Curve2D_5dcdv"]
+
+[node name="MovingPlatform" type="Path2D"]
+curve = SubResource("Curve2D_5dcdv")
+script = ExtResource("1_6j6f3")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="."]
+
+[node name="Platform" type="TileMapLayer" parent="PathFollow2D"]
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 16)
+tile_set = ExtResource("3_0aju4")
+use_kinematic_bodies = true

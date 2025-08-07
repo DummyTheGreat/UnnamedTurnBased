@@ -64,15 +64,15 @@ grow_vertical = 2
 mouse_filter = 2
 alignment = 1
 
-[node name="BattleCamera" type="Camera2D" parent="."]
+[node name="Field" type="Node2D" parent="."]
+script = ExtResource("4_6ek73")
+
+[node name="BattleCamera" type="Camera2D" parent="Field"]
 zoom = Vector2(2, 2)
 script = ExtResource("6_qwkl0")
 
-[node name="CenterFocus" type="Marker2D" parent="BattleCamera"]
+[node name="CenterFocus" type="Marker2D" parent="Field/BattleCamera"]
 script = ExtResource("4_x5rsb")
-
-[node name="Field" type="Node2D" parent="."]
-script = ExtResource("4_6ek73")
 
 [node name="Allies" type="Node2D" parent="Field"]
 
@@ -127,6 +127,3 @@ texture = ExtResource("3_ktxq8")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Field/Enemies/TestEnemy2"]
 shape = SubResource("RectangleShape2D_qxmty")
-
-[node name="MiniLayer" type="CanvasLayer" parent="."]
-layer = 2

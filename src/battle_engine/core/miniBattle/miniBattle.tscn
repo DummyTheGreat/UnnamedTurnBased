@@ -1,56 +1,15 @@
-[gd_scene load_steps=9 format=3 uid="uid://d4jgfqsixughp"]
+[gd_scene load_steps=5 format=3 uid="uid://d4jgfqsixughp"]
 
 [ext_resource type="Script" uid="uid://bcrunjev2xv1o" path="res://src/battle_engine/core/miniBattle/miniBattle.gd" id="1_38hfi"]
-[ext_resource type="Texture2D" uid="uid://bljn6wx6utep" path="res://assets/button.png" id="2_3k0da"]
 [ext_resource type="Script" uid="uid://8r4se643o7rw" path="res://src/battle_engine/core/miniBattle/miniPlayer.gd" id="3_ld1gy"]
 [ext_resource type="Texture2D" uid="uid://bb4jynn5qf43f" path="res://assets/player.png" id="4_xlevx"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_itmtr"]
-size = Vector2(20, 10)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_3k0da"]
-size = Vector2(20, 10)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ld1gy"]
-size = Vector2(20, 10)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v7f02"]
 size = Vector2(32, 32)
 
 [node name="MiniBattle" type="Node2D"]
+z_index = 1
 script = ExtResource("1_38hfi")
-
-[node name="Floor" type="StaticBody2D" parent="."]
-collision_layer = 4
-collision_mask = 0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
-shape = SubResource("RectangleShape2D_itmtr")
-
-[node name="Sprite2D" type="Sprite2D" parent="Floor"]
-texture = ExtResource("2_3k0da")
-
-[node name="LeftWall" type="StaticBody2D" parent="."]
-collision_layer = 8
-collision_mask = 0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
-shape = SubResource("RectangleShape2D_3k0da")
-
-[node name="Sprite2D" type="Sprite2D" parent="LeftWall"]
-position = Vector2(-7.62943e-06, -6.34789e-06)
-texture = ExtResource("2_3k0da")
-
-[node name="RightWall" type="StaticBody2D" parent="."]
-collision_layer = 8
-collision_mask = 0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
-shape = SubResource("RectangleShape2D_ld1gy")
-
-[node name="Sprite2D" type="Sprite2D" parent="RightWall"]
-position = Vector2(-7.62943e-06, -6.34789e-06)
-texture = ExtResource("2_3k0da")
 
 [node name="Player" type="CharacterBody2D" parent="."]
 position = Vector2(592, 534)
@@ -69,6 +28,9 @@ shape = SubResource("RectangleShape2D_v7f02")
 [node name="Grace" type="Timer" parent="Player"]
 wait_time = 0.5
 one_shot = true
+
+[node name="MiniCamera" type="Camera2D" parent="Player"]
+enabled = false
 
 [node name="Sequences" type="Node2D" parent="."]
 
